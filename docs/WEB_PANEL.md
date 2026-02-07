@@ -534,7 +534,7 @@ En la parte superior se muestran:
 
 ### Archivo panel_config.json
 
-El panel se configura desde [config/panel_config.json](config/panel_config.json). Ahí se definen:
+El panel se configura desde [server/config/panel_config.json](../server/config/panel_config.json). Ahí se definen:
 
 - **web_server**: host, puerto, `secret_key` y tiempo de sesión.
 - **authentication**: cookies de sesión, lockout y políticas de login.
@@ -778,7 +778,7 @@ Este script:
 1. **Cambiar contraseña por defecto**
 2. **Usar HTTPS** con Nginx/Apache como proxy reverso
 3. **Configurar firewall** para permitir solo IPs autorizadas
-4. **Mantener rate limiting** en [config/panel_config.json](config/panel_config.json)
+4. **Mantener rate limiting** en [server/config/panel_config.json](../server/config/panel_config.json)
 5. **Revisar logs regularmente**
 
 ### Ajustes recomendados en panel_config.json

@@ -6,7 +6,8 @@
 
 set -e
 
-INSTALL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+INSTALL_DIR="$SCRIPT_DIR/server"
 JAVA_VERSION="21"
 PAPER_VERSION="1.20.6"
 PAPER_BUILD="151"
@@ -38,8 +39,8 @@ fi
 
 # Download Paper
 echo "[3/8] Downloading Paper $PAPER_VERSION..."
-mkdir -p server
-cd server
+mkdir -p "$INSTALL_DIR"
+cd "$INSTALL_DIR"
 if [ ! -f "paper-$PAPER_VERSION-$PAPER_BUILD.jar" ]; then
     wget "https://api.papermc.io/v2/projects/paper/versions/$PAPER_VERSION/builds/$PAPER_BUILD/downloads/paper-$PAPER_VERSION-$PAPER_BUILD.jar"
 fi
@@ -49,16 +50,21 @@ echo "eula=true" > eula.txt
 
 # Build plugin
 echo "[4/8] Building MMORPG plugin..."
-cd "$INSTALL_DIR/mmorpg-plugin"
+cd "$SCRIPT_DIR/mmorpg-plugin"
 mvn clean package -DskipTests
-cp target/mmorpg-plugin-*.jar "$INSTALL_DIR/server/plugins/"
+mkdir -p "$INSTALL_DIR/plugins"
+cp target/mmorpg-plugin-*.jar "$INSTALL_DIR/plugins/"
 
 # Copy configs
 echo "[5/8] Copying configuration files..."
-cp -r "$INSTALL_DIR/config/"* "$INSTALL_DIR/server/"
+mkdir -p "$INSTALL_DIR/config"
+cp -r "$SCRIPT_DIR/config/"* "$INSTALL_DIR/config/"
 
 # Setup Python environment
 echo "[6/8] Setting up Python environment for web panel..."
+if [ ! -d "$INSTALL_DIR/web" ]; then
+    cp -r "$SCRIPT_DIR/web" "$INSTALL_DIR/"
+fi
 cd "$INSTALL_DIR/web"
 python3 -m venv venv
 source venv/bin/activate
@@ -74,7 +80,7 @@ After=network.target
 [Service]
 Type=simple
 User=$USER
-WorkingDirectory=$INSTALL_DIR/server
+WorkingDirectory=$INSTALL_DIR
 ExecStart=/usr/bin/java -Xms4G -Xmx4G -jar paper-$PAPER_VERSION-$PAPER_BUILD.jar nogui
 Restart=always
 

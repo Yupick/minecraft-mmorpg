@@ -49,8 +49,19 @@ if ! confirm "¿Estás seguro de que deseas continuar?"; then
 fi
 
 # Variables de rutas
-INSTALL_DIR="${MINECRAFT_INSTALL_DIR:-/opt/minecraft-mmorpg}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+INSTALL_DIR="${MINECRAFT_INSTALL_DIR:-$SCRIPT_DIR/server}"
 SERVICE_USER="${MINECRAFT_USER:-minecraft}"
+
+# Detectar estructura de servidor (actual vs legacy)
+SERVER_DIR="$INSTALL_DIR"
+if [ ! -d "$SERVER_DIR" ]; then
+    if [ -d "$INSTALL_DIR/server" ]; then
+        SERVER_DIR="$INSTALL_DIR/server"
+    elif [ -d "$INSTALL_DIR/minecraft-server" ]; then
+        SERVER_DIR="$INSTALL_DIR/minecraft-server"
+    fi
+fi
 
 echo ""
 echo -e "${BLUE}📍 Directorio de instalación: $INSTALL_DIR${NC}"
@@ -95,21 +106,42 @@ if confirm "¿Deseas crear un backup antes de desinstalar?"; then
     echo "  → Creando backup en: $BACKUP_DIR"
     
     # Copiar mundos
-    if [ -d "$INSTALL_DIR/minecraft-server/world" ]; then
+    if [ -n "$SERVER_DIR" ] && [ -d "$SERVER_DIR/worlds" ]; then
         echo "    • Copiando mundos..."
-        cp -r "$INSTALL_DIR/minecraft-server/world" "$BACKUP_DIR/" || true
+        cp -r "$SERVER_DIR/worlds" "$BACKUP_DIR/" || true
+    elif [ -n "$SERVER_DIR" ] && [ -d "$SERVER_DIR/world" ]; then
+        echo "    • Copiando mundos (legacy)..."
+        cp -r "$SERVER_DIR/world" "$BACKUP_DIR/" || true
     fi
     
     # Copiar base de datos
-    if [ -f "$INSTALL_DIR/data/universal.db" ]; then
+    if [ -n "$SERVER_DIR" ] && [ -f "$SERVER_DIR/config/data/universal.db" ]; then
         echo "    • Copiando base de datos..."
+        mkdir -p "$BACKUP_DIR/data"
+        cp "$SERVER_DIR/config/data/universal.db" "$BACKUP_DIR/data/" || true
+    elif [ -n "$SERVER_DIR" ] && [ -f "$SERVER_DIR/data/universal.db" ]; then
+        echo "    • Copiando base de datos (legacy)..."
+        mkdir -p "$BACKUP_DIR/data"
+        cp "$SERVER_DIR/data/universal.db" "$BACKUP_DIR/data/" || true
+    elif [ -f "$INSTALL_DIR/data/universal.db" ]; then
+        echo "    • Copiando base de datos (legacy)..."
         mkdir -p "$BACKUP_DIR/data"
         cp "$INSTALL_DIR/data/universal.db" "$BACKUP_DIR/data/" || true
     fi
     
     # Copiar configuraciones
-    if [ -d "$INSTALL_DIR/config" ]; then
+    if [ -n "$SERVER_DIR" ] && [ -d "$SERVER_DIR/config" ]; then
         echo "    • Copiando configuraciones..."
+        cp -r "$SERVER_DIR/config" "$BACKUP_DIR/" || true
+    elif [ -n "$SERVER_DIR" ]; then
+        echo "    • Copiando configuraciones (legacy)..."
+        cp -r "$SERVER_DIR"/config.yml "$BACKUP_DIR/" 2>/dev/null || true
+        cp -r "$SERVER_DIR"/*.json "$BACKUP_DIR/" 2>/dev/null || true
+        if [ -d "$SERVER_DIR/data" ]; then
+            cp -r "$SERVER_DIR/data" "$BACKUP_DIR/" || true
+        fi
+    elif [ -d "$INSTALL_DIR/config" ]; then
+        echo "    • Copiando configuraciones (legacy)..."
         cp -r "$INSTALL_DIR/config" "$BACKUP_DIR/" || true
     fi
     

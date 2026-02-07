@@ -13,8 +13,14 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m'
 
-INSTALL_DIR="${MINECRAFT_INSTALL_DIR:-/opt/minecraft-mmorpg}"
-SERVER_DIR="$INSTALL_DIR/minecraft-server"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BASE_DIR="${MINECRAFT_INSTALL_DIR:-$SCRIPT_DIR/../server}"
+SERVER_DIR="$BASE_DIR"
+if [ -d "$BASE_DIR/server" ]; then
+    SERVER_DIR="$BASE_DIR/server"
+elif [ -d "$BASE_DIR/minecraft-server" ]; then
+    SERVER_DIR="$BASE_DIR/minecraft-server"
+fi
 
 echo -e "${BLUE}"
 echo "═══════════════════════════════════════════════════════════════"

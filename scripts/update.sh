@@ -13,8 +13,15 @@ BLUE='\033[0;34m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
-INSTALL_DIR="${MINECRAFT_INSTALL_DIR:-/opt/minecraft-mmorpg}"
-REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+BASE_DIR="${MINECRAFT_INSTALL_DIR:-$REPO_DIR/server}"
+SERVER_DIR="$BASE_DIR"
+if [ -d "$BASE_DIR/server" ]; then
+    SERVER_DIR="$BASE_DIR/server"
+elif [ -d "$BASE_DIR/minecraft-server" ]; then
+    SERVER_DIR="$BASE_DIR/minecraft-server"
+fi
 
 echo -e "${BLUE}"
 echo "═══════════════════════════════════════════════════════════════"
@@ -23,7 +30,7 @@ echo "════════════════════════�
 echo -e "${NC}"
 
 echo "📍 Repositorio: $REPO_DIR"
-echo "📍 Instalación: $INSTALL_DIR"
+echo "📍 Instalación: $SERVER_DIR"
 echo ""
 
 # =====================================================================
@@ -111,9 +118,9 @@ echo -e "${BLUE}[4/5] Copiando archivos actualizados...${NC}"
 # Copiar plugin compilado
 if [ -f "$REPO_DIR/mmorpg-plugin/target/mmorpg-plugin-1.0.0.jar" ]; then
     echo "  → Copiando plugin..."
-    mkdir -p "$INSTALL_DIR/minecraft-server/plugins"
+     mkdir -p "$SERVER_DIR/plugins"
     cp "$REPO_DIR/mmorpg-plugin/target/mmorpg-plugin-1.0.0.jar" \
-       "$INSTALL_DIR/minecraft-server/plugins/"
+         "$SERVER_DIR/plugins/"
     echo -e "${GREEN}✓ Plugin actualizado${NC}"
 fi
 
@@ -125,9 +132,9 @@ if [ -d "$REPO_DIR/config" ]; then
             filename=$(basename "$config")
             
             # Solo copiar si no existe en destino
-            if [ ! -f "$INSTALL_DIR/config/$filename" ]; then
+            if [ ! -f "$SERVER_DIR/config/$filename" ]; then
                 echo "    • Nueva configuración: $filename"
-                cp "$config" "$INSTALL_DIR/config/" || true
+                cp "$config" "$SERVER_DIR/config/" || true
             fi
         fi
     done
@@ -136,14 +143,15 @@ fi
 # Actualizar panel web
 echo "  → Actualizando panel web..."
 if [ -d "$REPO_DIR/web" ]; then
-    cp -r "$REPO_DIR/web"/*.py "$INSTALL_DIR/web/" 2>/dev/null || true
-    cp -r "$REPO_DIR/web/templates" "$INSTALL_DIR/web/" 2>/dev/null || true
-    cp -r "$REPO_DIR/web/static" "$INSTALL_DIR/web/" 2>/dev/null || true
+    mkdir -p "$SERVER_DIR/web"
+    cp -r "$REPO_DIR/web"/*.py "$SERVER_DIR/web/" 2>/dev/null || true
+    cp -r "$REPO_DIR/web/templates" "$SERVER_DIR/web/" 2>/dev/null || true
+    cp -r "$REPO_DIR/web/static" "$SERVER_DIR/web/" 2>/dev/null || true
     
     # Actualizar dependencias de Python
     if [ -f "$REPO_DIR/web/requirements.txt" ]; then
-        if [ -f "$INSTALL_DIR/web/venv/bin/activate" ]; then
-            source "$INSTALL_DIR/web/venv/bin/activate"
+        if [ -f "$SERVER_DIR/web/venv/bin/activate" ]; then
+            source "$SERVER_DIR/web/venv/bin/activate"
             pip install -r "$REPO_DIR/web/requirements.txt" --upgrade
             deactivate
         fi
@@ -153,9 +161,9 @@ fi
 # Actualizar scripts
 echo "  → Actualizando scripts..."
 if [ -d "$REPO_DIR/scripts" ]; then
-    mkdir -p "$INSTALL_DIR/scripts"
-    cp -r "$REPO_DIR/scripts"/*.sh "$INSTALL_DIR/scripts/" 2>/dev/null || true
-    chmod +x "$INSTALL_DIR/scripts"/*.sh 2>/dev/null || true
+    mkdir -p "$SERVER_DIR/scripts"
+    cp -r "$REPO_DIR/scripts"/*.sh "$SERVER_DIR/scripts/" 2>/dev/null || true
+    chmod +x "$SERVER_DIR/scripts"/*.sh 2>/dev/null || true
 fi
 
 echo -e "${GREEN}✓ Archivos actualizados${NC}"

@@ -154,24 +154,22 @@ minecraft-mmorpg/
 │   ├── static/                 # CSS, JS, imágenes
 │   └── venv/                   # Entorno virtual Python
 │
-├── config/                     # Configuraciones
-│   ├── server.properties       # Configuración del servidor
-│   ├── config.yml              # Configuración del plugin
-│   ├── crafting_config.json    # Recetas de crafting
-│   ├── enchanting_config.json  # Configuración de encantamientos
-│   ├── respawn_config.json     # Zonas de respawn
-│   ├── dungeon_config.json     # Configuración de dungeons
-│   ├── events_config.json      # Eventos/invasiones
-│   ├── pets_config.json        # Configuración de pets
-│   ├── squad_config.json       # Configuración de squads
-│   ├── panel_config.json       # Configuración del panel web
-│   └── data/
-│       └── universal.db        # Base de datos SQLite principal
-│
-├── minecraft-server/           # Servidor Paper
+├── server/                     # Servidor Paper (directorio de instalación)
 │   ├── paper-1.20.6.jar        # Ejecutable del servidor
 │   ├── eula.txt                # EULA aceptado
 │   ├── server.properties       # Propiedades del servidor
+│   ├── config/                 # Configuraciones
+│   │   ├── config.yml           # Configuración del plugin
+│   │   ├── crafting_config.json # Recetas de crafting
+│   │   ├── enchanting_config.json # Configuración de encantamientos
+│   │   ├── respawn_config.json  # Zonas de respawn
+│   │   ├── dungeon_config.json  # Configuración de dungeons
+│   │   ├── events_config.json   # Eventos/invasiones
+│   │   ├── pets_config.json     # Configuración de pets
+│   │   ├── squad_config.json    # Configuración de squads
+│   │   ├── panel_config.json    # Configuración del panel web
+│   │   └── data/
+│   │       └── universal.db     # Base de datos SQLite principal
 │   ├── plugins/                # Plugins instalados
 │   │   ├── MMORPGPlugin.jar
 │   │   ├── Geyser-Spigot.jar
@@ -217,28 +215,28 @@ minecraft-mmorpg/
 
 ```bash
 # Método 1: Script directo
-cd minecraft-server
+cd server
 java -Xmx4G -Xms2G -jar paper-1.20.6.jar nogui
 
 # Método 2: Con screen (recomendado)
 screen -S minecraft
-cd minecraft-server
+cd server
 java -Xmx4G -Xms2G -jar paper-1.20.6.jar nogui
 # Ctrl+A+D para desconectar
 
 # Método 3: Servicio systemd (si configurado)
-sudo systemctl start minecraft-server
+sudo systemctl start mmorpg-server
 ```
 
 ### Iniciar el Panel Web
 
 ```bash
 # Método 1: Script directo
-cd web
+cd server/web
 ./start-web.sh
 
 # Método 2: Manual
-cd web
+cd server/web
 source venv/bin/activate
 python app.py
 
@@ -273,7 +271,7 @@ En el juego o consola:
 
 ### Configuración del Servidor
 
-Editar [minecraft-server/server.properties](minecraft-server/server.properties):
+Editar [server/server.properties](server/server.properties):
 
 ```properties
 server-port=25565
@@ -286,7 +284,7 @@ level-name=world
 
 ### Configuración del Plugin
 
-Editar [config/config.yml](config/config.yml):
+Editar [server/config/config.yml](server/config/config.yml):
 
 ```yaml
 language: es_ES
@@ -315,7 +313,7 @@ quests:
 
 ### Configuración del Panel Web
 
-Editar [config/panel_config.json](config/panel_config.json):
+Editar [server/config/panel_config.json](server/config/panel_config.json):
 
 ```json
 {

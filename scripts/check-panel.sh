@@ -11,7 +11,12 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m'
 
-INSTALL_DIR="${MINECRAFT_INSTALL_DIR:-/opt/minecraft-mmorpg}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BASE_DIR="${MINECRAFT_INSTALL_DIR:-$SCRIPT_DIR/../server}"
+SERVER_DIR="$BASE_DIR"
+if [ -d "$BASE_DIR/server" ]; then
+    SERVER_DIR="$BASE_DIR/server"
+fi
 WEB_PORT=5000
 
 echo -e "${BLUE}═══ Estado del Panel Web MMORPG ═══${NC}"
@@ -87,8 +92,8 @@ fi
 echo ""
 
 # Verificar base de datos
-if [ -f "$INSTALL_DIR/data/universal.db" ]; then
-    DB_SIZE=$(du -sh "$INSTALL_DIR/data/universal.db" | cut -f1)
+if [ -f "$SERVER_DIR/config/data/universal.db" ]; then
+    DB_SIZE=$(du -sh "$SERVER_DIR/config/data/universal.db" | cut -f1)
     echo -e "${GREEN}✓ Base de datos: $DB_SIZE${NC}"
 else
     echo -e "${RED}✗ Base de datos: NO ENCONTRADA${NC}"

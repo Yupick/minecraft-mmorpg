@@ -11,7 +11,13 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m'
 
-INSTALL_DIR="${MINECRAFT_INSTALL_DIR:-/opt/minecraft-mmorpg}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BASE_DIR="${MINECRAFT_INSTALL_DIR:-$SCRIPT_DIR/../server}"
+SERVER_DIR="$BASE_DIR"
+if [ -d "$BASE_DIR/server" ]; then
+    SERVER_DIR="$BASE_DIR/server"
+fi
+WEB_DIR="$SERVER_DIR/web"
 
 echo -e "${BLUE}"
 echo "═══════════════════════════════════════════════════════════════"
@@ -140,9 +146,9 @@ fi
 echo ""
 echo -e "${BLUE}[Base de Datos]${NC}"
 
-if [ -f "$INSTALL_DIR/data/universal.db" ]; then
-    DB_SIZE=$(du -sh "$INSTALL_DIR/data/universal.db" | cut -f1)
-    DB_MODIFIED=$(stat -c %y "$INSTALL_DIR/data/universal.db" 2>/dev/null | cut -d. -f1)
+if [ -f "$SERVER_DIR/config/data/universal.db" ]; then
+    DB_SIZE=$(du -sh "$SERVER_DIR/config/data/universal.db" | cut -f1)
+    DB_MODIFIED=$(stat -c %y "$SERVER_DIR/config/data/universal.db" 2>/dev/null | cut -d. -f1)
     
     echo -e "  Estado: ${GREEN}ENCONTRADA${NC}"
     echo "  Tamaño: $DB_SIZE"
@@ -150,7 +156,7 @@ if [ -f "$INSTALL_DIR/data/universal.db" ]; then
     
     # Verificar si SQLite puede abrir la BD
     if command -v sqlite3 &> /dev/null; then
-        TABLES=$(sqlite3 "$INSTALL_DIR/data/universal.db" "SELECT COUNT(*) FROM sqlite_master WHERE type='table';" 2>/dev/null || echo "0")
+        TABLES=$(sqlite3 "$SERVER_DIR/config/data/universal.db" "SELECT COUNT(*) FROM sqlite_master WHERE type='table';" 2>/dev/null || echo "0")
         echo "  Tablas: $TABLES"
     fi
 else
@@ -164,27 +170,27 @@ echo ""
 echo -e "${BLUE}[Archivos]${NC}"
 
 # Verificar app.py
-if [ -f "$INSTALL_DIR/web/app.py" ]; then
+if [ -f "$WEB_DIR/app.py" ]; then
     echo -e "  app.py: ${GREEN}✓${NC}"
 else
     echo -e "  app.py: ${RED}✗${NC}"
 fi
 
 # Verificar templates
-if [ -d "$INSTALL_DIR/web/templates" ]; then
-    TEMPLATE_COUNT=$(find "$INSTALL_DIR/web/templates" -name "*.html" | wc -l)
+if [ -d "$WEB_DIR/templates" ]; then
+    TEMPLATE_COUNT=$(find "$WEB_DIR/templates" -name "*.html" | wc -l)
     echo -e "  Templates: ${GREEN}$TEMPLATE_COUNT archivos${NC}"
 else
     echo -e "  Templates: ${RED}✗ directorio no encontrado${NC}"
 fi
 
 # Verificar entorno virtual
-if [ -d "$INSTALL_DIR/web/venv" ]; then
+if [ -d "$WEB_DIR/venv" ]; then
     echo -e "  Entorno virtual: ${GREEN}✓${NC}"
     
     # Versión de Python
-    if [ -f "$INSTALL_DIR/web/venv/bin/python" ]; then
-        PY_VERSION=$("$INSTALL_DIR/web/venv/bin/python" --version 2>&1)
+    if [ -f "$WEB_DIR/venv/bin/python" ]; then
+        PY_VERSION=$("$WEB_DIR/venv/bin/python" --version 2>&1)
         echo "    $PY_VERSION"
     fi
 else
@@ -197,16 +203,16 @@ fi
 echo ""
 echo -e "${BLUE}[Logs]${NC}"
 
-if [ -f "$INSTALL_DIR/web/panel.log" ]; then
-    LOG_SIZE=$(du -sh "$INSTALL_DIR/web/panel.log" | cut -f1)
-    LOG_LINES=$(wc -l < "$INSTALL_DIR/web/panel.log")
+if [ -f "$WEB_DIR/panel.log" ]; then
+    LOG_SIZE=$(du -sh "$WEB_DIR/panel.log" | cut -f1)
+    LOG_LINES=$(wc -l < "$WEB_DIR/panel.log")
     
-    echo "  Archivo: $INSTALL_DIR/web/panel.log"
+    echo "  Archivo: $WEB_DIR/panel.log"
     echo "  Tamaño: $LOG_SIZE ($LOG_LINES líneas)"
     
     # Últimas 3 líneas
     echo "  Últimas entradas:"
-    tail -3 "$INSTALL_DIR/web/panel.log" | sed 's/^/    /'
+    tail -3 "$WEB_DIR/panel.log" | sed 's/^/    /'
 fi
 
 # =====================================================================

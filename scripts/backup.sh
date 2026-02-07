@@ -14,7 +14,15 @@ YELLOW='\033[1;33m'
 NC='\033[0m'
 
 # Configuración
-INSTALL_DIR="${MINECRAFT_INSTALL_DIR:-/opt/minecraft-mmorpg}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BASE_DIR="${MINECRAFT_INSTALL_DIR:-$SCRIPT_DIR/../server}"
+SERVER_DIR="$BASE_DIR"
+
+if [ -d "$BASE_DIR/server" ]; then
+    SERVER_DIR="$BASE_DIR/server"
+elif [ -d "$BASE_DIR/minecraft-server" ]; then
+    SERVER_DIR="$BASE_DIR/minecraft-server"
+fi
 BACKUP_BASE_DIR="${BACKUP_DIR:-$HOME/minecraft-backups}"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 BACKUP_NAME="mmorpg-backup-$TIMESTAMP"
@@ -29,7 +37,7 @@ echo "  💾 BACKUP - SISTEMA MMORPG MINECRAFT"
 echo "═══════════════════════════════════════════════════════════════"
 echo -e "${NC}"
 
-echo "📍 Directorio de instalación: $INSTALL_DIR"
+echo "📍 Directorio de instalación: $SERVER_DIR"
 echo "📦 Directorio de backup: $BACKUP_DIR"
 echo ""
 
@@ -66,13 +74,13 @@ echo -e "${BLUE}[1/5] Backup de mundos...${NC}"
 
 mkdir -p "$BACKUP_DIR/worlds"
 
-backup_item "$INSTALL_DIR/minecraft-server/world" "$BACKUP_DIR/worlds" "Mundo principal"
-backup_item "$INSTALL_DIR/minecraft-server/world_nether" "$BACKUP_DIR/worlds" "Nether"
-backup_item "$INSTALL_DIR/minecraft-server/world_the_end" "$BACKUP_DIR/worlds" "The End"
+backup_item "$SERVER_DIR/world" "$BACKUP_DIR/worlds" "Mundo principal"
+backup_item "$SERVER_DIR/world_nether" "$BACKUP_DIR/worlds" "Nether"
+backup_item "$SERVER_DIR/world_the_end" "$BACKUP_DIR/worlds" "The End"
 
 # Backup de mundos adicionales en worlds/
-if [ -d "$INSTALL_DIR/minecraft-server/worlds" ]; then
-    for world in "$INSTALL_DIR/minecraft-server/worlds"/*; do
+if [ -d "$SERVER_DIR/worlds" ]; then
+    for world in "$SERVER_DIR/worlds"/*; do
         if [ -d "$world" ]; then
             backup_item "$world" "$BACKUP_DIR/worlds" "$(basename $world)"
         fi
@@ -87,11 +95,11 @@ echo -e "${BLUE}[2/5] Backup de base de datos...${NC}"
 
 mkdir -p "$BACKUP_DIR/data"
 
-backup_item "$INSTALL_DIR/data/universal.db" "$BACKUP_DIR/data" "Base de datos universal"
+backup_item "$SERVER_DIR/config/data/universal.db" "$BACKUP_DIR/data" "Base de datos universal"
 
 # Backup de bases de datos de mundos
-if [ -d "$INSTALL_DIR/data" ]; then
-    for db in "$INSTALL_DIR/data"/*.db; do
+if [ -d "$SERVER_DIR/config/data" ]; then
+    for db in "$SERVER_DIR/config/data"/*.db; do
         if [ -f "$db" ] && [ "$(basename $db)" != "universal.db" ]; then
             backup_item "$db" "$BACKUP_DIR/data" "$(basename $db)"
         fi
@@ -106,11 +114,11 @@ echo -e "${BLUE}[3/5] Backup de configuraciones...${NC}"
 
 mkdir -p "$BACKUP_DIR/config"
 
-backup_item "$INSTALL_DIR/config" "$BACKUP_DIR" "Configuraciones del plugin"
-backup_item "$INSTALL_DIR/minecraft-server/server.properties" "$BACKUP_DIR/config" "server.properties"
-backup_item "$INSTALL_DIR/minecraft-server/bukkit.yml" "$BACKUP_DIR/config" "bukkit.yml"
-backup_item "$INSTALL_DIR/minecraft-server/spigot.yml" "$BACKUP_DIR/config" "spigot.yml"
-backup_item "$INSTALL_DIR/minecraft-server/paper.yml" "$BACKUP_DIR/config" "paper.yml"
+backup_item "$SERVER_DIR/config" "$BACKUP_DIR" "Configuraciones del plugin"
+backup_item "$SERVER_DIR/server.properties" "$BACKUP_DIR/config" "server.properties"
+backup_item "$SERVER_DIR/bukkit.yml" "$BACKUP_DIR/config" "bukkit.yml"
+backup_item "$SERVER_DIR/spigot.yml" "$BACKUP_DIR/config" "spigot.yml"
+backup_item "$SERVER_DIR/paper.yml" "$BACKUP_DIR/config" "paper.yml"
 
 # =====================================================================
 # BACKUP DE PLUGINS
@@ -120,7 +128,7 @@ echo -e "${BLUE}[4/5] Backup de plugins...${NC}"
 
 mkdir -p "$BACKUP_DIR/plugins"
 
-backup_item "$INSTALL_DIR/minecraft-server/plugins" "$BACKUP_DIR" "Plugins"
+backup_item "$SERVER_DIR/plugins" "$BACKUP_DIR" "Plugins"
 
 # =====================================================================
 # BACKUP DE LOGS (últimos 7 días)
@@ -130,9 +138,9 @@ echo -e "${BLUE}[5/5] Backup de logs...${NC}"
 
 mkdir -p "$BACKUP_DIR/logs"
 
-if [ -d "$INSTALL_DIR/minecraft-server/logs" ]; then
+if [ -d "$SERVER_DIR/logs" ]; then
     echo "  → Copiando logs recientes..."
-    find "$INSTALL_DIR/minecraft-server/logs" -name "*.log*" -mtime -7 -exec cp {} "$BACKUP_DIR/logs/" \; 2>/dev/null || true
+    find "$SERVER_DIR/logs" -name "*.log*" -mtime -7 -exec cp {} "$BACKUP_DIR/logs/" \; 2>/dev/null || true
     local log_size=$(get_size "$BACKUP_DIR/logs")
     echo -e "${GREEN}✓ Logs copiados ($log_size)${NC}"
 fi

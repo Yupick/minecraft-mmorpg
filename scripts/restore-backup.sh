@@ -15,7 +15,14 @@ RED='\033[0;31m'
 NC='\033[0m'
 
 # Configuración
-INSTALL_DIR="${MINECRAFT_INSTALL_DIR:-/opt/minecraft-mmorpg}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BASE_DIR="${MINECRAFT_INSTALL_DIR:-$SCRIPT_DIR/../server}"
+SERVER_DIR="$BASE_DIR"
+if [ -d "$BASE_DIR/server" ]; then
+    SERVER_DIR="$BASE_DIR/server"
+elif [ -d "$BASE_DIR/minecraft-server" ]; then
+    SERVER_DIR="$BASE_DIR/minecraft-server"
+fi
 BACKUP_BASE_DIR="${BACKUP_DIR:-$HOME/minecraft-backups}"
 
 # Función de confirmación
@@ -159,8 +166,8 @@ if confirm "¿Deseas hacer un backup rápido del estado actual antes de restaura
     mkdir -p "$CURRENT_BACKUP"
     
     echo "  → Guardando estado actual en: $CURRENT_BACKUP"
-    cp -r "$INSTALL_DIR/data" "$CURRENT_BACKUP/" 2>/dev/null || true
-    cp -r "$INSTALL_DIR/config" "$CURRENT_BACKUP/" 2>/dev/null || true
+    cp -r "$SERVER_DIR/config/data" "$CURRENT_BACKUP/" 2>/dev/null || true
+    cp -r "$SERVER_DIR/config" "$CURRENT_BACKUP/" 2>/dev/null || true
     
     echo -e "${GREEN}✓ Backup actual guardado${NC}"
 fi
@@ -168,28 +175,28 @@ fi
 # Restaurar mundos
 if [ -d "$BACKUP_CONTENT/worlds" ]; then
     echo "  → Restaurando mundos..."
-    mkdir -p "$INSTALL_DIR/minecraft-server"
-    cp -r "$BACKUP_CONTENT/worlds"/* "$INSTALL_DIR/minecraft-server/" || true
+    mkdir -p "$SERVER_DIR"
+    cp -r "$BACKUP_CONTENT/worlds"/* "$SERVER_DIR/" || true
     echo -e "${GREEN}✓ Mundos restaurados${NC}"
 fi
 
 # Restaurar base de datos
 if [ -d "$BACKUP_CONTENT/data" ]; then
     echo "  → Restaurando base de datos..."
-    mkdir -p "$INSTALL_DIR/data"
-    cp -r "$BACKUP_CONTENT/data"/* "$INSTALL_DIR/data/" || true
+    mkdir -p "$SERVER_DIR/config/data"
+    cp -r "$BACKUP_CONTENT/data"/* "$SERVER_DIR/config/data/" || true
     echo -e "${GREEN}✓ Base de datos restaurada${NC}"
 fi
 
 # Restaurar configuraciones
 if [ -d "$BACKUP_CONTENT/config" ]; then
     echo "  → Restaurando configuraciones..."
-    mkdir -p "$INSTALL_DIR/config"
-    cp -r "$BACKUP_CONTENT/config"/* "$INSTALL_DIR/config/" || true
+    mkdir -p "$SERVER_DIR/config"
+    cp -r "$BACKUP_CONTENT/config"/* "$SERVER_DIR/config/" || true
     
     # Restaurar server.properties si existe
     if [ -f "$BACKUP_CONTENT/config/server.properties" ]; then
-        cp "$BACKUP_CONTENT/config/server.properties" "$INSTALL_DIR/minecraft-server/" || true
+        cp "$BACKUP_CONTENT/config/server.properties" "$SERVER_DIR/" || true
     fi
     
     echo -e "${GREEN}✓ Configuraciones restauradas${NC}"
@@ -198,15 +205,15 @@ fi
 # Restaurar plugins
 if [ -d "$BACKUP_CONTENT/plugins" ]; then
     echo "  → Restaurando plugins..."
-    mkdir -p "$INSTALL_DIR/minecraft-server/plugins"
-    cp -r "$BACKUP_CONTENT/plugins"/* "$INSTALL_DIR/minecraft-server/plugins/" || true
+    mkdir -p "$SERVER_DIR/plugins"
+    cp -r "$BACKUP_CONTENT/plugins"/* "$SERVER_DIR/plugins/" || true
     echo -e "${GREEN}✓ Plugins restaurados${NC}"
 fi
 
 # Ajustar permisos
 if [ -n "$MINECRAFT_USER" ] && id "$MINECRAFT_USER" &>/dev/null && [ "$EUID" -eq 0 ]; then
     echo "  → Ajustando permisos..."
-    chown -R "$MINECRAFT_USER:$MINECRAFT_USER" "$INSTALL_DIR"
+    chown -R "$MINECRAFT_USER:$MINECRAFT_USER" "$SERVER_DIR"
     echo -e "${GREEN}✓ Permisos ajustados${NC}"
 fi
 

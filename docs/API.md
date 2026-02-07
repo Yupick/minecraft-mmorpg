@@ -680,7 +680,7 @@ Cuando se excede el límite:
 }
 ```
 
-Los valores se configuran en [config/panel_config.json](config/panel_config.json).
+Los valores se configuran en [server/config/panel_config.json](../server/config/panel_config.json).
 
 ---
 

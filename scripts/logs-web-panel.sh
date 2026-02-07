@@ -8,8 +8,13 @@
 BLUE='\033[0;34m'
 NC='\033[0m'
 
-INSTALL_DIR="${MINECRAFT_INSTALL_DIR:-/opt/minecraft-mmorpg}"
-LOG_FILE="$INSTALL_DIR/web/panel.log"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BASE_DIR="${MINECRAFT_INSTALL_DIR:-$SCRIPT_DIR/../server}"
+SERVER_DIR="$BASE_DIR"
+if [ -d "$BASE_DIR/server" ]; then
+    SERVER_DIR="$BASE_DIR/server"
+fi
+LOG_FILE="$SERVER_DIR/web/panel.log"
 
 echo -e "${BLUE}═══ Logs del Panel Web MMORPG ═══${NC}"
 echo ""

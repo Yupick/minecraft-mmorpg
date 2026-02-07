@@ -51,7 +51,8 @@ echo "eula=true" > eula.txt
 
 # 5. Copiar plugin y configs
 cp ../mmorpg-plugin/target/mmorpg-plugin-1.0.0.jar plugins/
-cp -r ../config/* .
+mkdir -p config
+cp -r ../config/* config/
 
 # 6. Iniciar servidor (primera vez)
 java -Xms4G -Xmx4G -jar paper-1.20.6-151.jar nogui
@@ -89,7 +90,7 @@ sudo systemctl start mmorpg-web
 sudo systemctl status mmorpg-web
 
 # Manual
-cd web
+cd server/web
 source venv/bin/activate
 python app.py
 ```
@@ -128,7 +129,7 @@ Accede a: **http://localhost:5000**
 
 ## 🔧 Configuración
 
-### Archivo Principal: `config/config.yml`
+### Archivo Principal: `server/config/config.yml`
 
 ```yaml
 # Cambiar idioma
@@ -148,7 +149,7 @@ classes:
     # ...
 ```
 
-### Añadir Recetas de Crafteo: `config/crafting_config.json`
+### Añadir Recetas de Crafteo: `server/config/crafting_config.json`
 
 ```json
 {
@@ -164,7 +165,7 @@ classes:
 }
 ```
 
-### Crear Mazmorras: `config/dungeon_config.json`
+### Crear Mazmorras: `server/config/dungeon_config.json`
 
 ```json
 {
@@ -185,14 +186,14 @@ classes:
 
 ### Ubicación
 
-- **Base de datos universal:** `config/data/universal.db`
-- **Base de datos por mundo:** `worlds/<nombre_mundo>/world.db`
+- **Base de datos universal:** `server/config/data/universal.db`
+- **Base de datos por mundo:** `server/worlds/<nombre_mundo>/world.db`
 
 ### Consultar Datos
 
 ```bash
 # Abrir base de datos
-sqlite3 config/data/universal.db
+sqlite3 server/config/data/universal.db
 
 # Ver jugadores
 SELECT username, level, player_class, coins FROM players JOIN player_economy ON players.uuid = player_economy.player_uuid;
@@ -208,10 +209,10 @@ WHERE pq.status = 'active';
 
 ```bash
 # Backup manual
-cp config/data/universal.db config/data/universal.db.backup
+cp server/config/data/universal.db server/config/data/universal.db.backup
 
 # Restaurar
-cp config/data/universal.db.backup config/data/universal.db
+cp server/config/data/universal.db.backup server/config/data/universal.db
 ```
 
 ## 🌐 Panel Web
@@ -251,7 +252,7 @@ curl http://localhost:5000/api/players
 import sqlite3
 import bcrypt
 
-conn = sqlite3.connect('config/data/universal.db')
+conn = sqlite3.connect('server/config/data/universal.db')
 c = conn.cursor()
 
 # Generar nuevo hash
@@ -267,7 +268,7 @@ conn.close()
 ### Crear Nuevo Usuario Admin
 
 ```sql
--- En sqlite3 config/data/universal.db
+-- En sqlite3 server/config/data/universal.db
 INSERT INTO admin_users (username, password_hash, email, role) 
 VALUES ('nuevo_admin', '<hash_bcrypt>', 'admin@example.com', 'admin');
 ```
@@ -333,10 +334,10 @@ tail -f server/logs/latest.log | grep MMORPG
 
 ```bash
 # Verificar permisos
-ls -la config/data/
+ls -la server/config/data/
 
 # Recrear base de datos
-rm config/data/universal.db
+rm server/config/data/universal.db
 # Reiniciar servidor (se creará automáticamente)
 ```
 
@@ -350,7 +351,7 @@ ps aux | grep python
 netstat -tulpn | grep 5000
 
 # Reinstalar dependencias
-cd web
+cd server/web
 source venv/bin/activate
 pip install -r requirements.txt --upgrade
 ```
@@ -372,8 +373,8 @@ sudo systemctl restart mmorpg-server
 
 ```sql
 -- Optimizar base de datos
-sqlite3 config/data/universal.db "VACUUM;"
-sqlite3 config/data/universal.db "ANALYZE;"
+sqlite3 server/config/data/universal.db "VACUUM;"
+sqlite3 server/config/data/universal.db "ANALYZE;"
 ```
 
 ### Limpiar Logs Antiguos
@@ -387,7 +388,7 @@ find server/logs -name "*.log.gz" -mtime +7 -delete
 
 ```bash
 # 1. Hacer backup
-cp -r config/data config/data.backup
+cp -r server/config/data server/config/data.backup
 cp -r server/plugins server/plugins.backup
 
 # 2. Compilar nueva versión
@@ -407,9 +408,9 @@ sudo systemctl restart mmorpg-server
 
 ```
 server/logs/latest.log           - Log principal del servidor
-config/data/universal.db          - Base de datos principal
+server/config/data/universal.db   - Base de datos principal
 server/plugins/MMORPG/config.yml  - Configuración del plugin
-web/logs/web.log                  - Log del panel web
+server/web/logs/web.log            - Log del panel web
 ```
 
 ### Información de Debug
@@ -423,7 +424,7 @@ web/logs/web.log                  - Log del panel web
 
 - [ ] Servidor Minecraft iniciado correctamente
 - [ ] Plugin MMORPG cargado sin errores
-- [ ] Base de datos creada en `config/data/universal.db`
+- [ ] Base de datos creada en `server/config/data/universal.db`
 - [ ] Panel web accesible en http://localhost:5000
 - [ ] Contraseña de admin cambiada
 - [ ] Al menos 1 jugador puede conectarse

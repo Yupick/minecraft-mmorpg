@@ -43,7 +43,7 @@ minecraft-mmorpg/
 │   └── venv/
 ├── config/
 │   └── data/
-├── minecraft-server/
+├── server/
 │   ├── plugins/
 │   ├── worlds/
 │   └── logs/
@@ -660,7 +660,7 @@ Implementar tablas en `universal.db`:
    - Dar permisos de ejecución
 
 10. **Servicios Systemd (Opcional)**
-    - Crear `minecraft-server.service`
+    - Crear `mmorpg-server.service`
     - Crear `minecraft-web-panel.service`
     - Habilitar servicios
 
