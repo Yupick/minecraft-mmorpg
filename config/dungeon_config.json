@@ -1,0 +1,337 @@
+{
+  "dungeons": [
+    {
+      "id": "goblin_cave",
+      "name": "Cueva de Goblins",
+      "description": "Una cueva infestada de goblins malvados",
+      "difficulty": "easy",
+      "min_level": 5,
+      "max_level": 15,
+      "min_players": 1,
+      "max_players": 5,
+      "time_limit_minutes": 30,
+      "entrance_location": {
+        "world": "world",
+        "x": 100,
+        "y": 50,
+        "z": 100
+      },
+      "waves": [
+        {
+          "wave_number": 1,
+          "mobs": [
+            {
+              "type": "ZOMBIE",
+              "amount": 5,
+              "level": 5,
+              "custom_name": "&aGoblin Explorador"
+            }
+          ],
+          "delay_seconds": 0
+        },
+        {
+          "wave_number": 2,
+          "mobs": [
+            {
+              "type": "ZOMBIE",
+              "amount": 8,
+              "level": 7,
+              "custom_name": "&aGoblin Guerrero"
+            },
+            {
+              "type": "SKELETON",
+              "amount": 2,
+              "level": 7,
+              "custom_name": "&aGoblin Arquero"
+            }
+          ],
+          "delay_seconds": 10
+        },
+        {
+          "wave_number": 3,
+          "mobs": [
+            {
+              "type": "ZOMBIE",
+              "amount": 1,
+              "level": 15,
+              "custom_name": "&cJefe Goblin",
+              "is_boss": true,
+              "health_multiplier": 3.0,
+              "damage_multiplier": 1.5
+            },
+            {
+              "type": "ZOMBIE",
+              "amount": 4,
+              "level": 10,
+              "custom_name": "&aGuardia Goblin"
+            }
+          ],
+          "delay_seconds": 15
+        }
+      ],
+      "rewards": {
+        "xp": 500,
+        "coins": 200,
+        "items": [
+          {
+            "material": "IRON_SWORD",
+            "amount": 1,
+            "chance": 0.5,
+            "custom_name": "&aEspada de Goblin"
+          },
+          {
+            "material": "EMERALD",
+            "amount": 5,
+            "chance": 0.8
+          }
+        ]
+      },
+      "completion_message": "&a¡Has completado la Cueva de Goblins!",
+      "failure_message": "&cHas fallado en la Cueva de Goblins"
+    },
+    {
+      "id": "skeleton_fortress",
+      "name": "Fortaleza de Esqueletos",
+      "description": "Una antigua fortaleza custodiada por esqueletos malditos",
+      "difficulty": "medium",
+      "min_level": 15,
+      "max_level": 30,
+      "min_players": 2,
+      "max_players": 5,
+      "time_limit_minutes": 45,
+      "entrance_location": {
+        "world": "world",
+        "x": 200,
+        "y": 60,
+        "z": 200
+      },
+      "waves": [
+        {
+          "wave_number": 1,
+          "mobs": [
+            {
+              "type": "SKELETON",
+              "amount": 10,
+              "level": 15,
+              "custom_name": "&7Esqueleto Guardián"
+            }
+          ],
+          "delay_seconds": 0
+        },
+        {
+          "wave_number": 2,
+          "mobs": [
+            {
+              "type": "SKELETON",
+              "amount": 6,
+              "level": 18,
+              "custom_name": "&7Esqueleto Arquero"
+            },
+            {
+              "type": "WITHER_SKELETON",
+              "amount": 3,
+              "level": 20,
+              "custom_name": "&8Esqueleto Oscuro"
+            }
+          ],
+          "delay_seconds": 15
+        },
+        {
+          "wave_number": 3,
+          "mobs": [
+            {
+              "type": "SKELETON",
+              "amount": 8,
+              "level": 22,
+              "custom_name": "&7Esqueleto Veterano"
+            },
+            {
+              "type": "ZOMBIE",
+              "amount": 5,
+              "level": 22,
+              "custom_name": "&2Zombi Corrupto"
+            }
+          ],
+          "delay_seconds": 20
+        },
+        {
+          "wave_number": 4,
+          "mobs": [
+            {
+              "type": "WITHER_SKELETON",
+              "amount": 1,
+              "level": 30,
+              "custom_name": "&4Señor Esqueleto",
+              "is_boss": true,
+              "health_multiplier": 5.0,
+              "damage_multiplier": 2.0
+            },
+            {
+              "type": "WITHER_SKELETON",
+              "amount": 4,
+              "level": 25,
+              "custom_name": "&8Guardia de Elite"
+            }
+          ],
+          "delay_seconds": 30
+        }
+      ],
+      "rewards": {
+        "xp": 1500,
+        "coins": 500,
+        "items": [
+          {
+            "material": "DIAMOND_SWORD",
+            "amount": 1,
+            "chance": 0.3,
+            "custom_name": "&bEspada del Señor Esqueleto",
+            "enchantments": [
+              {
+                "type": "SHARPNESS",
+                "level": 3
+              }
+            ]
+          },
+          {
+            "material": "DIAMOND",
+            "amount": 3,
+            "chance": 0.7
+          }
+        ]
+      },
+      "completion_message": "&b¡Has conquistado la Fortaleza de Esqueletos!",
+      "failure_message": "&cHas sido derrotado en la Fortaleza de Esqueletos"
+    },
+    {
+      "id": "dragon_lair",
+      "name": "Guarida del Dragón",
+      "description": "La guarida de un poderoso dragón ancestral",
+      "difficulty": "hard",
+      "min_level": 40,
+      "max_level": 60,
+      "min_players": 3,
+      "max_players": 5,
+      "time_limit_minutes": 60,
+      "entrance_location": {
+        "world": "world",
+        "x": 300,
+        "y": 100,
+        "z": 300
+      },
+      "waves": [
+        {
+          "wave_number": 1,
+          "mobs": [
+            {
+              "type": "BLAZE",
+              "amount": 8,
+              "level": 40,
+              "custom_name": "&cDragoncillo de Fuego"
+            }
+          ],
+          "delay_seconds": 0
+        },
+        {
+          "wave_number": 2,
+          "mobs": [
+            {
+              "type": "MAGMA_CUBE",
+              "amount": 10,
+              "level": 42,
+              "custom_name": "&6Elemental de Magma"
+            },
+            {
+              "type": "BLAZE",
+              "amount": 5,
+              "level": 45,
+              "custom_name": "&cGuardián Dragón"
+            }
+          ],
+          "delay_seconds": 20
+        },
+        {
+          "wave_number": 3,
+          "mobs": [
+            {
+              "type": "ENDER_DRAGON",
+              "amount": 1,
+              "level": 60,
+              "custom_name": "&5Dragón Ancestral",
+              "is_boss": true,
+              "health_multiplier": 10.0,
+              "damage_multiplier": 3.0
+            }
+          ],
+          "delay_seconds": 30
+        }
+      ],
+      "rewards": {
+        "xp": 5000,
+        "coins": 2000,
+        "items": [
+          {
+            "material": "NETHERITE_SWORD",
+            "amount": 1,
+            "chance": 0.5,
+            "custom_name": "&5Colmillo del Dragón",
+            "enchantments": [
+              {
+                "type": "SHARPNESS",
+                "level": 5
+              },
+              {
+                "type": "FIRE_ASPECT",
+                "level": 2
+              }
+            ]
+          },
+          {
+            "material": "DRAGON_HEAD",
+            "amount": 1,
+            "chance": 1.0
+          },
+          {
+            "material": "NETHERITE_INGOT",
+            "amount": 5,
+            "chance": 0.8
+          }
+        ]
+      },
+      "completion_message": "&5¡Has derrotado al Dragón Ancestral!",
+      "failure_message": "&cEl Dragón Ancestral te ha vencido"
+    }
+  ],
+  "difficulty_settings": {
+    "easy": {
+      "mob_health_multiplier": 1.0,
+      "mob_damage_multiplier": 0.8,
+      "reward_multiplier": 1.0
+    },
+    "medium": {
+      "mob_health_multiplier": 1.5,
+      "mob_damage_multiplier": 1.0,
+      "reward_multiplier": 1.5
+    },
+    "hard": {
+      "mob_health_multiplier": 2.0,
+      "mob_damage_multiplier": 1.5,
+      "reward_multiplier": 2.5
+    },
+    "extreme": {
+      "mob_health_multiplier": 3.0,
+      "mob_damage_multiplier": 2.0,
+      "reward_multiplier": 4.0
+    }
+  },
+  "settings": {
+    "enable_dungeons": true,
+    "instance_per_party": true,
+    "allow_solo_dungeons": true,
+    "teleport_on_complete": true,
+    "teleport_on_fail": true,
+    "broadcast_completion": true,
+    "wave_announcement": true,
+    "boss_health_bar": true,
+    "dungeon_cooldown_minutes": 60
+  }
+}

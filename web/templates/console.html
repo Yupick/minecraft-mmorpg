@@ -1,0 +1,361 @@
+{% extends "base.html" %}
+
+{% block title %}Consola{% endblock %}
+{% block page_title %}Consola del Servidor{% endblock %}
+
+{% block extra_css %}
+<style>
+.console-output {
+    background: #000;
+    color: #0f0;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    padding: 20px;
+    height: 500px;
+    overflow-y: auto;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+.console-line {
+    margin: 2px 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.console-line.info { color: #0ff; }
+.console-line.warn { color: #ff0; }
+.console-line.error { color: #f00; }
+.console-line.success { color: #0f0; }
+
+.command-input-group {
+    display: flex;
+    gap: 10px;
+}
+
+.command-input {
+    background: #000;
+    color: #0f0;
+    border: 1px solid #0f0;
+    font-family: 'Courier New', monospace;
+}
+
+.command-input:focus {
+    background: #001100;
+    color: #0f0;
+    border-color: #0ff;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+}
+
+.quick-command {
+    font-size: 12px;
+    padding: 5px 10px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon text-success">
+                <i class="fas fa-circle"></i>
+            </div>
+            <div class="stat-number" id="server-status">ONLINE</div>
+            <div class="stat-label">Estado del Servidor</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon text-info">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-number" id="players-online">0</div>
+            <div class="stat-label">Jugadores Online</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon text-warning">
+                <i class="fas fa-memory"></i>
+            </div>
+            <div class="stat-number" id="memory-usage">0%</div>
+            <div class="stat-label">Uso de Memoria</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon text-primary">
+                <i class="fas fa-tachometer-alt"></i>
+            </div>
+            <div class="stat-number" id="tps">20.0</div>
+            <div class="stat-label">TPS</div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="fas fa-terminal"></i> Salida de la Consola</span>
+        <div>
+            <button class="btn btn-sm btn-warning" onclick="clearConsole()">
+                <i class="fas fa-eraser"></i> Limpiar
+            </button>
+            <button class="btn btn-sm btn-primary" onclick="toggleAutoScroll()">
+                <i class="fas fa-arrow-down"></i> <span id="autoscroll-text">Auto-scroll ON</span>
+            </button>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="console-output" id="console-output">
+            <div class="console-line info">[INFO] Consola del servidor MMORPG iniciada...</div>
+            <div class="console-line info">[INFO] Conectando al servidor...</div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="fas fa-keyboard"></i> Ejecutar Comando
+    </div>
+    <div class="card-body">
+        <div class="command-input-group">
+            <input type="text" class="form-control command-input" id="command-input" 
+                   placeholder="Ingresa un comando..." autocomplete="off">
+            <button class="btn btn-success" onclick="sendCommand()">
+                <i class="fas fa-paper-plane"></i> Enviar
+            </button>
+        </div>
+        
+        <div class="mt-3">
+            <small class="text-muted">Comandos rápidos:</small><br>
+            <button class="btn btn-outline-primary btn-sm quick-command mt-1" 
+                    onclick="setCommand('list')">list</button>
+            <button class="btn btn-outline-primary btn-sm quick-command mt-1" 
+                    onclick="setCommand('tps')">tps</button>
+            <button class="btn btn-outline-primary btn-sm quick-command mt-1" 
+                    onclick="setCommand('plugins')">plugins</button>
+            <button class="btn btn-outline-danger btn-sm quick-command mt-1" 
+                    onclick="setCommand('stop')">stop</button>
+            <button class="btn btn-outline-warning btn-sm quick-command mt-1" 
+                    onclick="setCommand('save-all')">save-all</button>
+            <button class="btn btn-outline-info btn-sm quick-command mt-1" 
+                    onclick="setCommand('whitelist list')">whitelist list</button>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-cogs"></i> Controles del Servidor
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4 mb-2">
+                <button class="btn btn-success w-100" onclick="serverAction('start')">
+                    <i class="fas fa-play"></i> Iniciar Servidor
+                </button>
+            </div>
+            <div class="col-md-4 mb-2">
+                <button class="btn btn-warning w-100" onclick="serverAction('restart')">
+                    <i class="fas fa-redo"></i> Reiniciar Servidor
+                </button>
+            </div>
+            <div class="col-md-4 mb-2">
+                <button class="btn btn-danger w-100" onclick="serverAction('stop')">
+                    <i class="fas fa-stop"></i> Detener Servidor
+                </button>
+            </div>
+        </div>
+        
+        <div class="alert alert-warning mt-3 mb-0">
+            <i class="fas fa-exclamation-triangle"></i>
+            <strong>Advertencia:</strong> Las acciones de control del servidor requieren permisos de administrador.
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let autoScroll = true;
+let commandHistory = [];
+let historyIndex = -1;
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Conectar a WebSocket o polling para logs en tiempo real
+    startLogPolling();
+    
+    // Enter para enviar comando
+    document.getElementById('command-input').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            sendCommand();
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            navigateHistory('up');
+        } else if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            navigateHistory('down');
+        }
+    });
+    
+    // Actualizar estadísticas cada 5 segundos
+    setInterval(updateServerStats, 5000);
+    updateServerStats();
+});
+
+function startLogPolling() {
+    // Simular logs en tiempo real
+    setInterval(() => {
+        if (Math.random() > 0.7) {
+            const messages = [
+                { type: 'info', text: '[INFO] Player joined the game' },
+                { type: 'info', text: '[INFO] Quest completed by player' },
+                { type: 'warn', text: '[WARN] Can\'t keep up! Is the server overloaded?' },
+                { type: 'info', text: '[INFO] Autosave completed' },
+                { type: 'success', text: '[SUCCESS] Backup created successfully' }
+            ];
+            const msg = messages[Math.floor(Math.random() * messages.length)];
+            addConsoleLog(msg.type, msg.text);
+        }
+    }, 3000);
+}
+
+function addConsoleLog(type, message) {
+    const output = document.getElementById('console-output');
+    const line = document.createElement('div');
+    line.className = `console-line ${type}`;
+    line.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+    output.appendChild(line);
+    
+    // Limitar a 500 líneas
+    while (output.children.length > 500) {
+        output.removeChild(output.firstChild);
+    }
+    
+    if (autoScroll) {
+        output.scrollTop = output.scrollHeight;
+    }
+}
+
+async function sendCommand() {
+    const input = document.getElementById('command-input');
+    const command = input.value.trim();
+    
+    if (!command) return;
+    
+    // Agregar al historial
+    commandHistory.push(command);
+    historyIndex = commandHistory.length;
+    
+    addConsoleLog('info', `> ${command}`);
+    
+    try {
+        const response = await fetch('/api/console/command', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({command})
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            if (data.output) {
+                data.output.split('\n').forEach(line => {
+                    if (line.trim()) {
+                        addConsoleLog('info', line);
+                    }
+                });
+            }
+        } else {
+            addConsoleLog('error', `[ERROR] ${data.error || 'Error ejecutando comando'}`);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        addConsoleLog('error', '[ERROR] No se pudo conectar al servidor');
+    }
+    
+    input.value = '';
+}
+
+function setCommand(cmd) {
+    document.getElementById('command-input').value = cmd;
+    document.getElementById('command-input').focus();
+}
+
+function navigateHistory(direction) {
+    if (direction === 'up' && historyIndex > 0) {
+        historyIndex--;
+        document.getElementById('command-input').value = commandHistory[historyIndex];
+    } else if (direction === 'down') {
+        if (historyIndex < commandHistory.length - 1) {
+            historyIndex++;
+            document.getElementById('command-input').value = commandHistory[historyIndex];
+        } else {
+            historyIndex = commandHistory.length;
+            document.getElementById('command-input').value = '';
+        }
+    }
+}
+
+function clearConsole() {
+    document.getElementById('console-output').innerHTML = 
+        '<div class="console-line info">[INFO] Consola limpiada</div>';
+}
+
+function toggleAutoScroll() {
+    autoScroll = !autoScroll;
+    document.getElementById('autoscroll-text').textContent = 
+        autoScroll ? 'Auto-scroll ON' : 'Auto-scroll OFF';
+}
+
+async function serverAction(action) {
+    const confirmMsg = {
+        start: '¿Iniciar el servidor?',
+        restart: '¿Reiniciar el servidor? Los jugadores serán desconectados.',
+        stop: '¿Detener el servidor? Los jugadores serán desconectados.'
+    };
+    
+    if (!confirm(confirmMsg[action])) return;
+    
+    addConsoleLog('warn', `[SYSTEM] Ejecutando acción: ${action.toUpperCase()}`);
+    
+    try {
+        const response = await fetch(`/api/server/${action}`, {
+            method: 'POST'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            addConsoleLog('success', `[SUCCESS] ${action.toUpperCase()} completado`);
+        } else {
+            addConsoleLog('error', `[ERROR] ${data.error || 'Error en la acción'}`);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        addConsoleLog('error', '[ERROR] No se pudo ejecutar la acción');
+    }
+}
+
+async function updateServerStats() {
+    try {
+        const response = await fetch('/api/server/stats');
+        const data = await response.json();
+        
+        if (data.success) {
+            document.getElementById('server-status').textContent = 
+                data.stats.online ? 'ONLINE' : 'OFFLINE';
+            document.getElementById('players-online').textContent = 
+                data.stats.players_online || 0;
+            document.getElementById('memory-usage').textContent = 
+                (data.stats.memory_usage || 0) + '%';
+            document.getElementById('tps').textContent = 
+                (data.stats.tps || 20.0).toFixed(1);
+        }
+    } catch (error) {
+        // Silencioso si falla
+    }
+}
+</script>
+{% endblock %}

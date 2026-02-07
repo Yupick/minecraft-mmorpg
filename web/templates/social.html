@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}Sistemas Sociales{% endblock %}
+{% block page_title %}Sistemas Sociales{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card p-4">
+            <h4>Guilds/Clanes</h4>
+            <div class="mb-3">
+                <input id="guild-name" class="form-control mb-2" placeholder="Nombre">
+                <input id="guild-tag" class="form-control mb-2" placeholder="Tag">
+                <input id="guild-leader" class="form-control mb-2" placeholder="UUID Líder">
+                <input id="guild-desc" class="form-control mb-2" placeholder="Descripción">
+                <button class="btn btn-primary" onclick="createGuild()">Crear Guild</button>
+            </div>
+            <ul id="guilds-list" class="list-group"></ul>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card p-4">
+            <h4>Amigos y Mensajes</h4>
+            <div class="mb-3">
+                <input id="friend-from" class="form-control mb-2" placeholder="UUID Remitente">
+                <input id="friend-to" class="form-control mb-2" placeholder="UUID Destinatario">
+                <button class="btn btn-secondary" onclick="sendFriendRequest()">Enviar solicitud</button>
+                <button class="btn btn-success" onclick="acceptFriendRequest()">Aceptar solicitud</button>
+            </div>
+            <div class="mb-3">
+                <input id="mail-to" class="form-control mb-2" placeholder="UUID Destinatario">
+                <input id="mail-subject" class="form-control mb-2" placeholder="Asunto">
+                <textarea id="mail-content" class="form-control mb-2" placeholder="Contenido"></textarea>
+                <button class="btn btn-warning" onclick="sendMail()">Enviar Mail</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+async function loadGuilds() {
+    const res = await fetch('/api/social/guilds');
+    const data = await res.json();
+    const list = document.getElementById('guilds-list');
+    list.innerHTML = '';
+    data.forEach(g => {
+        const item = document.createElement('li');
+        item.className = 'list-group-item';
+        item.textContent = `${g.name} [${g.tag || '-'}] - ${g.leader_uuid}`;
+        list.appendChild(item);
+    });
+}
+
+async function createGuild() {
+    const payload = {
+        name: document.getElementById('guild-name').value,
+        tag: document.getElementById('guild-tag').value,
+        leader_uuid: document.getElementById('guild-leader').value,
+        description: document.getElementById('guild-desc').value
+    };
+    await fetch('/api/social/guilds', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)});
+    loadGuilds();
+}
+
+async function sendFriendRequest() {
+    const payload = {
+        from_uuid: document.getElementById('friend-from').value,
+        to_uuid: document.getElementById('friend-to').value
+    };
+    await fetch('/api/social/friends/request', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)});
+}
+
+async function acceptFriendRequest() {
+    const payload = {
+        from_uuid: document.getElementById('friend-from').value,
+        to_uuid: document.getElementById('friend-to').value
+    };
+    await fetch('/api/social/friends/accept', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)});
+}
+
+async function sendMail() {
+    const payload = {
+        to_uuid: document.getElementById('mail-to').value,
+        subject: document.getElementById('mail-subject').value,
+        content: document.getElementById('mail-content').value
+    };
+    await fetch('/api/social/mail/send', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)});
+}
+
+loadGuilds();
+</script>
+{% endblock %}

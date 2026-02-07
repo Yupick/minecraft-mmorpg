@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}PvP{% endblock %}
+{% block page_title %}PvP{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card p-4">
+            <h4>Arenas</h4>
+            <div class="mb-3">
+                <input id="arena-name" class="form-control mb-2" placeholder="Nombre">
+                <input id="arena-world" class="form-control mb-2" placeholder="Mundo">
+                <div class="row g-2">
+                    <div class="col"><input id="arena-x" class="form-control" placeholder="X"></div>
+                    <div class="col"><input id="arena-y" class="form-control" placeholder="Y"></div>
+                    <div class="col"><input id="arena-z" class="form-control" placeholder="Z"></div>
+                    <div class="col"><input id="arena-radius" class="form-control" placeholder="Radio"></div>
+                </div>
+                <button class="btn btn-primary mt-2" onclick="createArena()">Crear Arena</button>
+            </div>
+            <ul id="arenas-list" class="list-group"></ul>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card p-4">
+            <h4>Rankings</h4>
+            <ul id="rankings-list" class="list-group"></ul>
+        </div>
+    </div>
+</div>
+
+<script>
+async function loadArenas() {
+    const res = await fetch('/api/pvp/arenas');
+    const data = await res.json();
+    const list = document.getElementById('arenas-list');
+    list.innerHTML = '';
+    data.forEach(a => {
+        const item = document.createElement('li');
+        item.className = 'list-group-item';
+        item.textContent = `${a.name} (${a.world})`;
+        list.appendChild(item);
+    });
+}
+
+async function loadRankings() {
+    const res = await fetch('/api/pvp/rankings');
+    const data = await res.json();
+    const list = document.getElementById('rankings-list');
+    list.innerHTML = '';
+    data.forEach(r => {
+        const item = document.createElement('li');
+        item.className = 'list-group-item';
+        item.textContent = `${r.player_uuid} - ${r.rating} (${r.wins}W/${r.losses}L)`;
+        list.appendChild(item);
+    });
+}
+
+async function createArena() {
+    const payload = {
+        name: document.getElementById('arena-name').value,
+        world: document.getElementById('arena-world').value,
+        x: parseFloat(document.getElementById('arena-x').value || '0'),
+        y: parseFloat(document.getElementById('arena-y').value || '0'),
+        z: parseFloat(document.getElementById('arena-z').value || '0'),
+        radius: parseFloat(document.getElementById('arena-radius').value || '25')
+    };
+    await fetch('/api/pvp/arenas/create', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)});
+    loadArenas();
+}
+
+loadArenas();
+loadRankings();
+</script>
+{% endblock %}

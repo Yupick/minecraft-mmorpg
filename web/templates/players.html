@@ -1,0 +1,428 @@
+{% extends "base.html" %}
+
+{% block title %}Jugadores{% endblock %}
+{% block page_title %}Gestión de Jugadores{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon text-primary">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-number" id="total-players">0</div>
+            <div class="stat-label">Total Jugadores</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon text-success">
+                <i class="fas fa-circle"></i>
+            </div>
+            <div class="stat-number" id="online-players">0</div>
+            <div class="stat-label">En Línea</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon text-info">
+                <i class="fas fa-level-up-alt"></i>
+            </div>
+            <div class="stat-number" id="avg-level">0</div>
+            <div class="stat-label">Nivel Promedio</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon text-warning">
+                <i class="fas fa-coins"></i>
+            </div>
+            <div class="stat-number" id="total-wealth">0</div>
+            <div class="stat-label">Riqueza Total</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="fas fa-users"></i> Lista de Jugadores</span>
+        <div>
+            <input type="text" id="search-player" class="form-control form-control-sm" 
+                   placeholder="Buscar jugador..." style="width: 250px; display: inline-block;">
+            <button class="btn btn-sm btn-primary ms-2" onclick="loadPlayers()">
+                <i class="fas fa-sync"></i> Actualizar
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th>UUID</th>
+                        <th>Nombre</th>
+                        <th>Nivel</th>
+                        <th>EXP</th>
+                        <th>Clase</th>
+                        <th>Monedas</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="players-table-body">
+                    <tr>
+                        <td colspan="8" class="text-center">
+                            <i class="fas fa-spinner fa-spin"></i> Cargando...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para editar jugador -->
+<div class="modal fade" id="editPlayerModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-user-edit"></i> Editar Jugador</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-player-form">
+                    <input type="hidden" id="edit-player-uuid">
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="edit-player-name" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Clase</label>
+                            <select class="form-select" id="edit-player-class">
+                                <option value="warrior">Guerrero</option>
+                                <option value="mage">Mago</option>
+                                <option value="rogue">Pícaro</option>
+                                <option value="archer">Arquero</option>
+                                <option value="tank">Tanque</option>
+                                <option value="healer">Sanador</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Nivel</label>
+                            <input type="number" class="form-control" id="edit-player-level" min="1" max="100">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Experiencia</label>
+                            <input type="number" class="form-control" id="edit-player-exp" min="0">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Monedas</label>
+                            <input type="number" class="form-control" id="edit-player-balance" min="0" step="0.01">
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Fuerza</label>
+                            <input type="number" class="form-control" id="edit-player-strength" min="0">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Defensa</label>
+                            <input type="number" class="form-control" id="edit-player-defense" min="0">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Velocidad</label>
+                            <input type="number" class="form-control" id="edit-player-speed" min="0">
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">HP</label>
+                            <input type="number" class="form-control" id="edit-player-hp" min="0" step="0.1">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Mana</label>
+                            <input type="number" class="form-control" id="edit-player-mana" min="0" step="0.1">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="savePlayerChanges()">
+                    <i class="fas fa-save"></i> Guardar Cambios
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para ver estadísticas -->
+<div class="modal fade" id="statsModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-chart-bar"></i> Estadísticas del Jugador</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <h6 id="stats-player-name" class="mb-3"></h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <canvas id="statsChart"></canvas>
+                    </div>
+                    <div class="col-md-6">
+                        <div id="stats-details"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let playersData = [];
+let statsChart = null;
+
+// Cargar jugadores al inicio
+document.addEventListener('DOMContentLoaded', function() {
+    loadPlayers();
+    
+    // Búsqueda en tiempo real
+    document.getElementById('search-player').addEventListener('input', filterPlayers);
+    
+    // Actualizar cada 30 segundos
+    setInterval(loadPlayers, 30000);
+});
+
+async function loadPlayers() {
+    try {
+        const response = await fetch('/api/players');
+        const data = await response.json();
+        
+        if (data.success) {
+            playersData = data.players;
+            displayPlayers(playersData);
+            updateStats(playersData);
+        }
+    } catch (error) {
+        console.error('Error cargando jugadores:', error);
+    }
+}
+
+function displayPlayers(players) {
+    const tbody = document.getElementById('players-table-body');
+    
+    if (players.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center">No hay jugadores registrados</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = players.map(player => `
+        <tr>
+            <td><small>${player.uuid.substring(0, 8)}...</small></td>
+            <td>
+                <img src="https://minotar.net/avatar/${player.name}/16" class="me-2" alt="">
+                <strong>${player.name}</strong>
+            </td>
+            <td><span class="badge bg-info">${player.level}</span></td>
+            <td>${player.exp.toLocaleString()}</td>
+            <td><span class="badge bg-secondary">${player.class || 'Sin clase'}</span></td>
+            <td><i class="fas fa-coins text-warning"></i> ${player.balance.toFixed(2)}</td>
+            <td>
+                ${player.online ? 
+                    '<span class="badge bg-success"><i class="fas fa-circle"></i> Online</span>' : 
+                    '<span class="badge bg-danger"><i class="fas fa-circle"></i> Offline</span>'}
+            </td>
+            <td>
+                <button class="btn btn-sm btn-primary" onclick="editPlayer('${player.uuid}')" title="Editar">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-sm btn-info" onclick="viewStats('${player.uuid}')" title="Estadísticas">
+                    <i class="fas fa-chart-bar"></i>
+                </button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function filterPlayers() {
+    const search = document.getElementById('search-player').value.toLowerCase();
+    const filtered = playersData.filter(p => 
+        p.name.toLowerCase().includes(search) || 
+        p.uuid.toLowerCase().includes(search)
+    );
+    displayPlayers(filtered);
+}
+
+function updateStats(players) {
+    document.getElementById('total-players').textContent = players.length;
+    document.getElementById('online-players').textContent = players.filter(p => p.online).length;
+    
+    const avgLevel = players.length > 0 ? 
+        Math.round(players.reduce((sum, p) => sum + p.level, 0) / players.length) : 0;
+    document.getElementById('avg-level').textContent = avgLevel;
+    
+    const totalWealth = players.reduce((sum, p) => sum + p.balance, 0);
+    document.getElementById('total-wealth').textContent = totalWealth.toFixed(0);
+}
+
+async function editPlayer(uuid) {
+    const player = playersData.find(p => p.uuid === uuid);
+    if (!player) return;
+    
+    // Cargar datos del jugador en el formulario
+    document.getElementById('edit-player-uuid').value = player.uuid;
+    document.getElementById('edit-player-name').value = player.name;
+    document.getElementById('edit-player-class').value = player.class || 'warrior';
+    document.getElementById('edit-player-level').value = player.level;
+    document.getElementById('edit-player-exp').value = player.exp;
+    document.getElementById('edit-player-balance').value = player.balance;
+    document.getElementById('edit-player-strength').value = player.strength || 0;
+    document.getElementById('edit-player-defense').value = player.defense || 0;
+    document.getElementById('edit-player-speed').value = player.speed || 0;
+    document.getElementById('edit-player-hp').value = player.hp || 100;
+    document.getElementById('edit-player-mana').value = player.mana || 100;
+    
+    // Mostrar modal
+    new bootstrap.Modal(document.getElementById('editPlayerModal')).show();
+}
+
+async function savePlayerChanges() {
+    const uuid = document.getElementById('edit-player-uuid').value;
+    const updates = {
+        class: document.getElementById('edit-player-class').value,
+        level: parseInt(document.getElementById('edit-player-level').value),
+        exp: parseInt(document.getElementById('edit-player-exp').value),
+        balance: parseFloat(document.getElementById('edit-player-balance').value),
+        strength: parseInt(document.getElementById('edit-player-strength').value),
+        defense: parseInt(document.getElementById('edit-player-defense').value),
+        speed: parseInt(document.getElementById('edit-player-speed').value),
+        hp: parseFloat(document.getElementById('edit-player-hp').value),
+        mana: parseFloat(document.getElementById('edit-player-mana').value)
+    };
+    
+    try {
+        const response = await fetch(`/api/players/${uuid}`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(updates)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            bootstrap.Modal.getInstance(document.getElementById('editPlayerModal')).hide();
+            loadPlayers();
+            showAlert('success', 'Jugador actualizado correctamente');
+        } else {
+            showAlert('danger', 'Error al actualizar jugador');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showAlert('danger', 'Error de conexión');
+    }
+}
+
+async function viewStats(uuid) {
+    const player = playersData.find(p => p.uuid === uuid);
+    if (!player) return;
+    
+    document.getElementById('stats-player-name').textContent = `Estadísticas de ${player.name}`;
+    
+    // Crear gráfico
+    const ctx = document.getElementById('statsChart');
+    
+    if (statsChart) {
+        statsChart.destroy();
+    }
+    
+    statsChart = new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: ['Fuerza', 'Defensa', 'Velocidad', 'HP', 'Mana'],
+            datasets: [{
+                label: player.name,
+                data: [
+                    player.strength || 0,
+                    player.defense || 0,
+                    player.speed || 0,
+                    (player.hp || 100) / 10,
+                    (player.mana || 100) / 10
+                ],
+                backgroundColor: 'rgba(74, 144, 226, 0.2)',
+                borderColor: 'rgb(74, 144, 226)',
+                pointBackgroundColor: 'rgb(74, 144, 226)',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: 'rgb(74, 144, 226)'
+            }]
+        },
+        options: {
+            scales: {
+                r: {
+                    ticks: {color: '#e0e0e0'},
+                    grid: {color: 'rgba(255,255,255,0.1)'},
+                    pointLabels: {color: '#e0e0e0'}
+                }
+            },
+            plugins: {
+                legend: {labels: {color: '#e0e0e0'}}
+            }
+        }
+    });
+    
+    // Detalles
+    document.getElementById('stats-details').innerHTML = `
+        <div class="list-group">
+            <div class="list-group-item bg-transparent">
+                <strong>Nivel:</strong> ${player.level}
+            </div>
+            <div class="list-group-item bg-transparent">
+                <strong>Experiencia:</strong> ${player.exp.toLocaleString()}
+            </div>
+            <div class="list-group-item bg-transparent">
+                <strong>Clase:</strong> ${player.class || 'Sin clase'}
+            </div>
+            <div class="list-group-item bg-transparent">
+                <strong>Monedas:</strong> ${player.balance.toFixed(2)}
+            </div>
+            <div class="list-group-item bg-transparent">
+                <strong>Fuerza:</strong> ${player.strength || 0}
+            </div>
+            <div class="list-group-item bg-transparent">
+                <strong>Defensa:</strong> ${player.defense || 0}
+            </div>
+            <div class="list-group-item bg-transparent">
+                <strong>Velocidad:</strong> ${player.speed || 0}
+            </div>
+        </div>
+    `;
+    
+    new bootstrap.Modal(document.getElementById('statsModal')).show();
+}
+
+function showAlert(type, message) {
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${type} alert-dismissible fade show`;
+    alert.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.querySelector('.main-content').insertBefore(alert, document.querySelector('.main-content').firstChild);
+    
+    setTimeout(() => {
+        const bsAlert = new bootstrap.Alert(alert);
+        bsAlert.close();
+    }, 3000);
+}
+</script>
+{% endblock %}

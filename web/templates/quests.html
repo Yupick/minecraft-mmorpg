@@ -1,0 +1,465 @@
+{% extends "base.html" %}
+
+{% block title %}Misiones{% endblock %}
+{% block page_title %}Gestión de Misiones{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon text-primary">
+                <i class="fas fa-scroll"></i>
+            </div>
+            <div class="stat-number" id="total-quests">0</div>
+            <div class="stat-label">Total Misiones</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon text-success">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-number" id="completed-quests">0</div>
+            <div class="stat-label">Completadas</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon text-warning">
+                <i class="fas fa-hourglass-half"></i>
+            </div>
+            <div class="stat-number" id="active-quests">0</div>
+            <div class="stat-label">En Progreso</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon text-info">
+                <i class="fas fa-user-check"></i>
+            </div>
+            <div class="stat-number" id="players-with-quests">0</div>
+            <div class="stat-label">Jugadores Activos</div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-list"></i> Lista de Misiones</span>
+                <div>
+                    <button class="btn btn-success btn-sm" onclick="showCreateQuestModal()">
+                        <i class="fas fa-plus"></i> Nueva Misión
+                    </button>
+                    <button class="btn btn-primary btn-sm" onclick="loadQuests()">
+                        <i class="fas fa-sync"></i> Actualizar
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Tipo</th>
+                                <th>Nivel Req.</th>
+                                <th>Objetivo</th>
+                                <th>Recompensas</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="quests-table">
+                            <tr>
+                                <td colspan="8" class="text-center">
+                                    <i class="fas fa-spinner fa-spin"></i> Cargando...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal crear/editar misión -->
+<div class="modal fade" id="questModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="questModalTitle">
+                    <i class="fas fa-scroll"></i> Nueva Misión
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="quest-form">
+                    <input type="hidden" id="quest-id">
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <label class="form-label">Nombre de la Misión *</label>
+                            <input type="text" class="form-control" id="quest-name" 
+                                   placeholder="Ej: El Rey de los Goblins" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Nivel Requerido *</label>
+                            <input type="number" class="form-control" id="quest-level" 
+                                   min="1" max="100" value="1" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Descripción *</label>
+                        <textarea class="form-control" id="quest-description" rows="3"
+                                  placeholder="Describe la misión..." required></textarea>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Tipo de Misión *</label>
+                            <select class="form-select" id="quest-type" required>
+                                <option value="kill">Matar Mobs</option>
+                                <option value="collect">Recolectar Items</option>
+                                <option value="deliver">Entregar Items</option>
+                                <option value="talk">Hablar con NPC</option>
+                                <option value="location">Visitar Ubicación</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Estado</label>
+                            <select class="form-select" id="quest-status">
+                                <option value="active">Activa</option>
+                                <option value="disabled">Deshabilitada</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Objetivo (JSON) *</label>
+                        <textarea class="form-control font-monospace" id="quest-objective" rows="3"
+                                  placeholder='{"type": "ZOMBIE", "amount": 10}' required></textarea>
+                        <small class="text-muted">
+                            Ejemplos: {"type": "ZOMBIE", "amount": 10} | {"item": "DIAMOND", "amount": 5}
+                        </small>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Recompensa - Monedas</label>
+                            <input type="number" class="form-control" id="quest-reward-coins" 
+                                   min="0" step="0.01" value="0">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Recompensa - EXP</label>
+                            <input type="number" class="form-control" id="quest-reward-exp" 
+                                   min="0" value="0">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Items (JSON)</label>
+                            <input type="text" class="form-control" id="quest-reward-items" 
+                                   placeholder='["DIAMOND:2"]'>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">NPC Inicio</label>
+                            <input type="text" class="form-control" id="quest-npc-start" 
+                                   placeholder="Nombre del NPC">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">NPC Entrega</label>
+                            <input type="text" class="form-control" id="quest-npc-end" 
+                                   placeholder="Nombre del NPC">
+                        </div>
+                    </div>
+                    
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="quest-repeatable">
+                        <label class="form-check-label" for="quest-repeatable">
+                            Misión Repetible
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="saveQuest()">
+                    <i class="fas fa-save"></i> Guardar Misión
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal detalles de progreso -->
+<div class="modal fade" id="progressModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-chart-line"></i> Progreso de la Misión
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <h6 id="progress-quest-name" class="mb-3"></h6>
+                <div id="progress-details"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let questsData = [];
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadQuests();
+    setInterval(loadQuests, 30000);
+});
+
+async function loadQuests() {
+    try {
+        const response = await fetch('/api/quests');
+        const data = await response.json();
+        
+        if (data.success) {
+            questsData = data.quests;
+            displayQuests(questsData);
+            updateStats(questsData);
+        }
+    } catch (error) {
+        console.error('Error cargando misiones:', error);
+    }
+}
+
+function displayQuests(quests) {
+    const tbody = document.getElementById('quests-table');
+    
+    if (quests.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center">No hay misiones configuradas</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = quests.map(quest => `
+        <tr>
+            <td><span class="badge bg-dark">${quest.id}</span></td>
+            <td><strong>${quest.name}</strong></td>
+            <td>
+                <span class="badge ${getTypeBadge(quest.type)}">
+                    ${getTypeLabel(quest.type)}
+                </span>
+            </td>
+            <td>Nivel ${quest.required_level}</td>
+            <td><small>${JSON.stringify(quest.objective).substring(0, 30)}...</small></td>
+            <td>
+                ${quest.reward_coins > 0 ? `<i class="fas fa-coins text-warning"></i> ${quest.reward_coins}` : ''}
+                ${quest.reward_exp > 0 ? `<i class="fas fa-star text-info"></i> ${quest.reward_exp}` : ''}
+            </td>
+            <td>
+                ${quest.status === 'active' ?
+                    '<span class="badge bg-success">Activa</span>' :
+                    '<span class="badge bg-secondary">Deshabilitada</span>'}
+            </td>
+            <td>
+                <button class="btn btn-sm btn-primary" onclick="editQuest(${quest.id})" title="Editar">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-sm btn-info" onclick="viewProgress(${quest.id})" title="Ver Progreso">
+                    <i class="fas fa-chart-line"></i>
+                </button>
+                <button class="btn btn-sm btn-danger" onclick="deleteQuest(${quest.id})" title="Eliminar">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function getTypeBadge(type) {
+    const badges = {
+        kill: 'bg-danger',
+        collect: 'bg-success',
+        deliver: 'bg-primary',
+        talk: 'bg-info',
+        location: 'bg-warning'
+    };
+    return badges[type] || 'bg-secondary';
+}
+
+function getTypeLabel(type) {
+    const labels = {
+        kill: 'Matar',
+        collect: 'Recolectar',
+        deliver: 'Entregar',
+        talk: 'Hablar',
+        location: 'Ubicación'
+    };
+    return labels[type] || type;
+}
+
+function updateStats(quests) {
+    document.getElementById('total-quests').textContent = quests.length;
+    
+    // Simular estadísticas (en producción vendrían de la API)
+    document.getElementById('completed-quests').textContent = 
+        Math.floor(quests.length * 0.6);
+    document.getElementById('active-quests').textContent = 
+        Math.floor(quests.length * 0.3);
+    document.getElementById('players-with-quests').textContent = 
+        Math.floor(quests.length * 2.5);
+}
+
+function showCreateQuestModal() {
+    document.getElementById('quest-form').reset();
+    document.getElementById('quest-id').value = '';
+    document.getElementById('questModalTitle').innerHTML = 
+        '<i class="fas fa-plus"></i> Nueva Misión';
+    new bootstrap.Modal(document.getElementById('questModal')).show();
+}
+
+function editQuest(id) {
+    const quest = questsData.find(q => q.id === id);
+    if (!quest) return;
+    
+    document.getElementById('quest-id').value = quest.id;
+    document.getElementById('quest-name').value = quest.name;
+    document.getElementById('quest-description').value = quest.description;
+    document.getElementById('quest-type').value = quest.type;
+    document.getElementById('quest-level').value = quest.required_level;
+    document.getElementById('quest-objective').value = JSON.stringify(quest.objective);
+    document.getElementById('quest-reward-coins').value = quest.reward_coins;
+    document.getElementById('quest-reward-exp').value = quest.reward_exp;
+    document.getElementById('quest-reward-items').value = 
+        quest.reward_items ? JSON.stringify(quest.reward_items) : '';
+    document.getElementById('quest-status').value = quest.status;
+    document.getElementById('quest-npc-start').value = quest.npc_start || '';
+    document.getElementById('quest-npc-end').value = quest.npc_end || '';
+    document.getElementById('quest-repeatable').checked = quest.repeatable;
+    
+    document.getElementById('questModalTitle').innerHTML = 
+        '<i class="fas fa-edit"></i> Editar Misión';
+    new bootstrap.Modal(document.getElementById('questModal')).show();
+}
+
+async function saveQuest() {
+    const questId = document.getElementById('quest-id').value;
+    const questData = {
+        name: document.getElementById('quest-name').value,
+        description: document.getElementById('quest-description').value,
+        type: document.getElementById('quest-type').value,
+        required_level: parseInt(document.getElementById('quest-level').value),
+        objective: JSON.parse(document.getElementById('quest-objective').value),
+        reward_coins: parseFloat(document.getElementById('quest-reward-coins').value),
+        reward_exp: parseInt(document.getElementById('quest-reward-exp').value),
+        reward_items: document.getElementById('quest-reward-items').value ? 
+            JSON.parse(document.getElementById('quest-reward-items').value) : null,
+        status: document.getElementById('quest-status').value,
+        npc_start: document.getElementById('quest-npc-start').value,
+        npc_end: document.getElementById('quest-npc-end').value,
+        repeatable: document.getElementById('quest-repeatable').checked
+    };
+    
+    try {
+        const url = questId ? `/api/quests/${questId}` : '/api/quests/create';
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(questData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            bootstrap.Modal.getInstance(document.getElementById('questModal')).hide();
+            loadQuests();
+            showAlert('success', questId ? 'Misión actualizada' : 'Misión creada correctamente');
+        } else {
+            showAlert('danger', 'Error al guardar misión');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showAlert('danger', 'Error de conexión o JSON inválido');
+    }
+}
+
+async function deleteQuest(id) {
+    if (!confirm('¿Estás seguro de eliminar esta misión?')) return;
+    
+    try {
+        const response = await fetch(`/api/quests/${id}/delete`, {
+            method: 'POST'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            loadQuests();
+            showAlert('success', 'Misión eliminada');
+        } else {
+            showAlert('danger', 'Error al eliminar misión');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showAlert('danger', 'Error de conexión');
+    }
+}
+
+async function viewProgress(id) {
+    const quest = questsData.find(q => q.id === id);
+    if (!quest) return;
+    
+    document.getElementById('progress-quest-name').textContent = quest.name;
+    
+    // Simular progreso (en producción vendría de la API)
+    const progressHTML = `
+        <div class="list-group">
+            <div class="list-group-item bg-transparent">
+                <strong>Jugadores con esta misión:</strong> 15
+            </div>
+            <div class="list-group-item bg-transparent">
+                <strong>Completadas:</strong> 8
+            </div>
+            <div class="list-group-item bg-transparent">
+                <strong>En progreso:</strong> 5
+            </div>
+            <div class="list-group-item bg-transparent">
+                <strong>No iniciadas:</strong> 2
+            </div>
+        </div>
+        <div class="mt-3">
+            <h6>Tasa de completación</h6>
+            <div class="progress" style="height: 25px;">
+                <div class="progress-bar bg-success" role="progressbar" 
+                     style="width: 53%">53%</div>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('progress-details').innerHTML = progressHTML;
+    new bootstrap.Modal(document.getElementById('progressModal')).show();
+}
+
+function showAlert(type, message) {
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${type} alert-dismissible fade show`;
+    alert.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.querySelector('.main-content').insertBefore(alert, document.querySelector('.main-content').firstChild);
+    
+    setTimeout(() => {
+        const bsAlert = new bootstrap.Alert(alert);
+        bsAlert.close();
+    }, 3000);
+}
+</script>
+{% endblock %}

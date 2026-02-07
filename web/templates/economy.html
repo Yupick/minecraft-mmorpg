@@ -1,0 +1,481 @@
+{% extends "base.html" %}
+
+{% block title %}Economía{% endblock %}
+{% block page_title %}Sistema Económico{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon text-warning">
+                <i class="fas fa-coins"></i>
+            </div>
+            <div class="stat-number" id="total-circulation">0</div>
+            <div class="stat-label">Monedas en Circulación</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon text-success">
+                <i class="fas fa-arrow-up"></i>
+            </div>
+            <div class="stat-number" id="total-earned">0</div>
+            <div class="stat-label">Generado (24h)</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon text-danger">
+                <i class="fas fa-arrow-down"></i>
+            </div>
+            <div class="stat-number" id="total-spent">0</div>
+            <div class="stat-label">Gastado (24h)</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon text-info">
+                <i class="fas fa-exchange-alt"></i>
+            </div>
+            <div class="stat-number" id="total-transactions">0</div>
+            <div class="stat-label">Transacciones (24h)</div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-chart-line"></i> Actividad Económica
+            </div>
+            <div class="card-body">
+                <canvas id="economyChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-history"></i> Transacciones Recientes</span>
+                <button class="btn btn-sm btn-primary" onclick="loadTransactions()">
+                    <i class="fas fa-sync"></i> Actualizar
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Jugador</th>
+                                <th>Tipo</th>
+                                <th>Cantidad</th>
+                                <th>Razón</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactions-table">
+                            <tr>
+                                <td colspan="5" class="text-center">
+                                    <i class="fas fa-spinner fa-spin"></i> Cargando...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-trophy"></i> Top Jugadores por Riqueza
+            </div>
+            <div class="card-body">
+                <div id="top-players-list">
+                    <div class="text-center">
+                        <i class="fas fa-spinner fa-spin"></i> Cargando...
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-chart-pie"></i> Distribución de Riqueza
+            </div>
+            <div class="card-body">
+                <canvas id="distributionChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-tools"></i> Herramientas Económicas
+            </div>
+            <div class="card-body">
+                <button class="btn btn-success w-100 mb-2" onclick="showAddMoneyModal()">
+                    <i class="fas fa-plus-circle"></i> Agregar Monedas
+                </button>
+                <button class="btn btn-danger w-100 mb-2" onclick="showRemoveMoneyModal()">
+                    <i class="fas fa-minus-circle"></i> Remover Monedas
+                </button>
+                <button class="btn btn-warning w-100" onclick="exportEconomyData()">
+                    <i class="fas fa-file-export"></i> Exportar Datos
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para agregar dinero -->
+<div class="modal fade" id="addMoneyModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-plus-circle"></i> Agregar Monedas</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="add-money-form">
+                    <div class="mb-3">
+                        <label class="form-label">Jugador</label>
+                        <input type="text" class="form-control" id="add-money-player" 
+                               placeholder="Nombre del jugador" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Cantidad</label>
+                        <input type="number" class="form-control" id="add-money-amount" 
+                               placeholder="0.00" step="0.01" min="0.01" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Razón</label>
+                        <input type="text" class="form-control" id="add-money-reason" 
+                               placeholder="Motivo de la adición" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" onclick="addMoney()">
+                    <i class="fas fa-check"></i> Agregar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para remover dinero -->
+<div class="modal fade" id="removeMoneyModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-minus-circle"></i> Remover Monedas</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="remove-money-form">
+                    <div class="mb-3">
+                        <label class="form-label">Jugador</label>
+                        <input type="text" class="form-control" id="remove-money-player" 
+                               placeholder="Nombre del jugador" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Cantidad</label>
+                        <input type="number" class="form-control" id="remove-money-amount" 
+                               placeholder="0.00" step="0.01" min="0.01" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Razón</label>
+                        <input type="text" class="form-control" id="remove-money-reason" 
+                               placeholder="Motivo de la remoción" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" onclick="removeMoney()">
+                    <i class="fas fa-check"></i> Remover
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let economyChart = null;
+let distributionChart = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadEconomyData();
+    loadTransactions();
+    loadTopPlayers();
+    
+    // Actualizar cada 30 segundos
+    setInterval(() => {
+        loadEconomyData();
+        loadTransactions();
+        loadTopPlayers();
+    }, 30000);
+});
+
+async function loadEconomyData() {
+    try {
+        const response = await fetch('/api/economy/stats');
+        const data = await response.json();
+        
+        if (data.success) {
+            document.getElementById('total-circulation').textContent = 
+                data.stats.total_circulation.toLocaleString();
+            document.getElementById('total-earned').textContent = 
+                data.stats.earned_24h.toLocaleString();
+            document.getElementById('total-spent').textContent = 
+                data.stats.spent_24h.toLocaleString();
+            document.getElementById('total-transactions').textContent = 
+                data.stats.transactions_24h;
+            
+            updateEconomyChart(data.stats.history);
+            updateDistributionChart(data.stats.distribution);
+        }
+    } catch (error) {
+        console.error('Error cargando datos económicos:', error);
+    }
+}
+
+function updateEconomyChart(history) {
+    const ctx = document.getElementById('economyChart');
+    
+    if (economyChart) {
+        economyChart.destroy();
+    }
+    
+    economyChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: history.map(h => h.date),
+            datasets: [
+                {
+                    label: 'Generado',
+                    data: history.map(h => h.earned),
+                    borderColor: 'rgb(40, 167, 69)',
+                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                    tension: 0.4
+                },
+                {
+                    label: 'Gastado',
+                    data: history.map(h => h.spent),
+                    borderColor: 'rgb(220, 53, 69)',
+                    backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                    tension: 0.4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {labels: {color: '#e0e0e0'}},
+                tooltip: {mode: 'index', intersect: false}
+            },
+            scales: {
+                x: {ticks: {color: '#e0e0e0'}, grid: {color: 'rgba(255,255,255,0.1)'}},
+                y: {ticks: {color: '#e0e0e0'}, grid: {color: 'rgba(255,255,255,0.1)'}}
+            }
+        }
+    });
+}
+
+function updateDistributionChart(distribution) {
+    const ctx = document.getElementById('distributionChart');
+    
+    if (distributionChart) {
+        distributionChart.destroy();
+    }
+    
+    distributionChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: distribution.map(d => d.range),
+            datasets: [{
+                data: distribution.map(d => d.count),
+                backgroundColor: [
+                    '#4a90e2',
+                    '#7b68ee',
+                    '#28a745',
+                    '#ffc107',
+                    '#dc3545'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {color: '#e0e0e0'}
+                }
+            }
+        }
+    });
+}
+
+async function loadTransactions() {
+    try {
+        const response = await fetch('/api/economy/transactions');
+        const data = await response.json();
+        
+        if (data.success) {
+            const tbody = document.getElementById('transactions-table');
+            
+            if (data.transactions.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center">No hay transacciones recientes</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = data.transactions.map(tx => `
+                <tr>
+                    <td><small>${new Date(tx.timestamp).toLocaleString()}</small></td>
+                    <td>${tx.player_name}</td>
+                    <td>
+                        ${tx.type === 'earn' ? 
+                            '<span class="badge bg-success"><i class="fas fa-plus"></i> Ingreso</span>' : 
+                            '<span class="badge bg-danger"><i class="fas fa-minus"></i> Gasto</span>'}
+                    </td>
+                    <td class="${tx.type === 'earn' ? 'text-success' : 'text-danger'}">
+                        ${tx.type === 'earn' ? '+' : '-'}${tx.amount.toFixed(2)}
+                    </td>
+                    <td><small>${tx.reason}</small></td>
+                </tr>
+            `).join('');
+        }
+    } catch (error) {
+        console.error('Error cargando transacciones:', error);
+    }
+}
+
+async function loadTopPlayers() {
+    try {
+        const response = await fetch('/api/players');
+        const data = await response.json();
+        
+        if (data.success) {
+            const topPlayers = data.players
+                .sort((a, b) => b.balance - a.balance)
+                .slice(0, 10);
+            
+            const html = topPlayers.map((player, index) => `
+                <div class="d-flex justify-content-between align-items-center mb-3 p-2 
+                            ${index === 0 ? 'bg-warning bg-opacity-10' : 
+                              index === 1 ? 'bg-secondary bg-opacity-10' : 
+                              index === 2 ? 'bg-danger bg-opacity-10' : ''}" 
+                     style="border-radius: 5px;">
+                    <div>
+                        <span class="badge ${
+                            index === 0 ? 'bg-warning' : 
+                            index === 1 ? 'bg-secondary' : 
+                            index === 2 ? 'bg-danger' : 'bg-dark'
+                        }">${index + 1}</span>
+                        <strong class="ms-2">${player.name}</strong>
+                    </div>
+                    <div>
+                        <i class="fas fa-coins text-warning"></i>
+                        <strong>${player.balance.toLocaleString()}</strong>
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('top-players-list').innerHTML = html;
+        }
+    } catch (error) {
+        console.error('Error cargando top players:', error);
+    }
+}
+
+function showAddMoneyModal() {
+    document.getElementById('add-money-form').reset();
+    new bootstrap.Modal(document.getElementById('addMoneyModal')).show();
+}
+
+function showRemoveMoneyModal() {
+    document.getElementById('remove-money-form').reset();
+    new bootstrap.Modal(document.getElementById('removeMoneyModal')).show();
+}
+
+async function addMoney() {
+    const player = document.getElementById('add-money-player').value;
+    const amount = parseFloat(document.getElementById('add-money-amount').value);
+    const reason = document.getElementById('add-money-reason').value;
+    
+    try {
+        const response = await fetch('/api/economy/add', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({player, amount, reason})
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            bootstrap.Modal.getInstance(document.getElementById('addMoneyModal')).hide();
+            loadEconomyData();
+            loadTransactions();
+            showAlert('success', `Se agregaron ${amount} monedas a ${player}`);
+        } else {
+            showAlert('danger', 'Error al agregar monedas');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showAlert('danger', 'Error de conexión');
+    }
+}
+
+async function removeMoney() {
+    const player = document.getElementById('remove-money-player').value;
+    const amount = parseFloat(document.getElementById('remove-money-amount').value);
+    const reason = document.getElementById('remove-money-reason').value;
+    
+    try {
+        const response = await fetch('/api/economy/remove', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({player, amount, reason})
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            bootstrap.Modal.getInstance(document.getElementById('removeMoneyModal')).hide();
+            loadEconomyData();
+            loadTransactions();
+            showAlert('success', `Se removieron ${amount} monedas de ${player}`);
+        } else {
+            showAlert('danger', 'Error al remover monedas');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showAlert('danger', 'Error de conexión');
+    }
+}
+
+function exportEconomyData() {
+    window.location.href = '/api/economy/export';
+    showAlert('info', 'Descargando datos económicos...');
+}
+
+function showAlert(type, message) {
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${type} alert-dismissible fade show`;
+    alert.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.querySelector('.main-content').insertBefore(alert, document.querySelector('.main-content').firstChild);
+    
+    setTimeout(() => {
+        const bsAlert = new bootstrap.Alert(alert);
+        bsAlert.close();
+    }, 3000);
+}
+</script>
+{% endblock %}

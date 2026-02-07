@@ -1,0 +1,239 @@
+{
+  "recipes": [
+    {
+      "id": "iron_sword_enhanced",
+      "name": "Espada de Hierro Mejorada",
+      "description": "Una espada de hierro con estadísticas mejoradas",
+      "required_level": 10,
+      "ingredients": [
+        {
+          "material": "IRON_INGOT",
+          "amount": 3
+        },
+        {
+          "material": "STICK",
+          "amount": 1
+        },
+        {
+          "material": "DIAMOND",
+          "amount": 1
+        }
+      ],
+      "result": {
+        "material": "IRON_SWORD",
+        "amount": 1,
+        "custom_name": "&6Espada de Hierro Mejorada",
+        "lore": [
+          "&7Daño: &c+15",
+          "&7Nivel Requerido: &e10"
+        ],
+        "enchantments": [
+          {
+            "type": "SHARPNESS",
+            "level": 2
+          }
+        ],
+        "stats": {
+          "damage": 15,
+          "attack_speed": 1.6
+        }
+      },
+      "cost_coins": 100,
+      "cost_xp": 50,
+      "success_rate": 95,
+      "category": "weapons"
+    },
+    {
+      "id": "magic_staff",
+      "name": "Bastón Mágico",
+      "description": "Un bastón imbuido con magia arcana",
+      "required_level": 15,
+      "ingredients": [
+        {
+          "material": "STICK",
+          "amount": 1
+        },
+        {
+          "material": "AMETHYST_SHARD",
+          "amount": 5
+        },
+        {
+          "material": "GLOWSTONE_DUST",
+          "amount": 10
+        }
+      ],
+      "result": {
+        "material": "BLAZE_ROD",
+        "amount": 1,
+        "custom_name": "&5Bastón Mágico",
+        "lore": [
+          "&7Poder Mágico: &d+25",
+          "&7Maná: &b+50",
+          "&7Nivel Requerido: &e15"
+        ],
+        "enchantments": [
+          {
+            "type": "UNBREAKING",
+            "level": 3
+          }
+        ],
+        "stats": {
+          "magic_power": 25,
+          "mana_bonus": 50
+        }
+      },
+      "cost_coins": 250,
+      "cost_xp": 100,
+      "success_rate": 85,
+      "category": "magic_weapons"
+    },
+    {
+      "id": "health_potion_greater",
+      "name": "Poción de Salud Mayor",
+      "description": "Restaura una gran cantidad de vida",
+      "required_level": 20,
+      "ingredients": [
+        {
+          "material": "POTION",
+          "amount": 1
+        },
+        {
+          "material": "GLISTERING_MELON_SLICE",
+          "amount": 3
+        },
+        {
+          "material": "GOLDEN_CARROT",
+          "amount": 2
+        }
+      ],
+      "result": {
+        "material": "POTION",
+        "amount": 3,
+        "custom_name": "&cPoción de Salud Mayor",
+        "lore": [
+          "&7Restaura &c100 HP",
+          "&7Nivel Requerido: &e20"
+        ],
+        "potion_type": "INSTANT_HEAL",
+        "potion_extended": false,
+        "potion_upgraded": true
+      },
+      "cost_coins": 50,
+      "cost_xp": 25,
+      "success_rate": 100,
+      "category": "consumables"
+    },
+    {
+      "id": "diamond_armor_reinforced",
+      "name": "Peto de Diamante Reforzado",
+      "description": "Armadura de diamante con protección adicional",
+      "required_level": 30,
+      "ingredients": [
+        {
+          "material": "DIAMOND",
+          "amount": 8
+        },
+        {
+          "material": "NETHERITE_SCRAP",
+          "amount": 2
+        },
+        {
+          "material": "IRON_BLOCK",
+          "amount": 1
+        }
+      ],
+      "result": {
+        "material": "DIAMOND_CHESTPLATE",
+        "amount": 1,
+        "custom_name": "&bPeto de Diamante Reforzado",
+        "lore": [
+          "&7Defensa: &9+50",
+          "&7Durabilidad: &a+200",
+          "&7Nivel Requerido: &e30"
+        ],
+        "enchantments": [
+          {
+            "type": "PROTECTION",
+            "level": 3
+          },
+          {
+            "type": "UNBREAKING",
+            "level": 2
+          }
+        ],
+        "stats": {
+          "defense": 50,
+          "durability_bonus": 200
+        }
+      },
+      "cost_coins": 500,
+      "cost_xp": 200,
+      "success_rate": 80,
+      "category": "armor"
+    },
+    {
+      "id": "rogue_dagger",
+      "name": "Daga de Asesino",
+      "description": "Una daga veloz perfecta para pícaros",
+      "required_level": 25,
+      "ingredients": [
+        {
+          "material": "IRON_INGOT",
+          "amount": 2
+        },
+        {
+          "material": "FLINT",
+          "amount": 5
+        },
+        {
+          "material": "PHANTOM_MEMBRANE",
+          "amount": 3
+        }
+      ],
+      "result": {
+        "material": "IRON_SWORD",
+        "amount": 1,
+        "custom_name": "&8Daga de Asesino",
+        "lore": [
+          "&7Daño: &c+12",
+          "&7Velocidad: &a+2.8",
+          "&7Crítico: &e+15%",
+          "&7Nivel Requerido: &e25",
+          "&7Clase: &dPícaro"
+        ],
+        "enchantments": [
+          {
+            "type": "SHARPNESS",
+            "level": 3
+          }
+        ],
+        "stats": {
+          "damage": 12,
+          "attack_speed": 2.8,
+          "critical_chance": 0.15
+        },
+        "class_requirement": "rogue"
+      },
+      "cost_coins": 350,
+      "cost_xp": 150,
+      "success_rate": 90,
+      "category": "weapons"
+    }
+  ],
+  "categories": {
+    "weapons": "Armas",
+    "magic_weapons": "Armas Mágicas",
+    "armor": "Armaduras",
+    "consumables": "Consumibles",
+    "materials": "Materiales",
+    "tools": "Herramientas"
+  },
+  "settings": {
+    "enable_crafting_animation": true,
+    "crafting_time_seconds": 3,
+    "failed_craft_return_ingredients": true,
+    "ingredient_return_percentage": 50,
+    "enable_recipe_discovery": true,
+    "broadcast_rare_crafts": true
+  }
+}

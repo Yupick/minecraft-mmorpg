@@ -1,0 +1,227 @@
+{
+  "respawn_zones": [
+    {
+      "id": "spawn",
+      "name": "Zona de Inicio",
+      "description": "Punto de aparición principal del servidor",
+      "world": "world",
+      "location": {
+        "x": 0,
+        "y": 64,
+        "z": 0,
+        "yaw": 0,
+        "pitch": 0
+      },
+      "radius": 50,
+      "is_default": true,
+      "require_permission": false,
+      "permission": "",
+      "priority": 100,
+      "effects_on_spawn": [
+        {
+          "type": "DAMAGE_RESISTANCE",
+          "duration": 5,
+          "amplifier": 2
+        },
+        {
+          "type": "REGENERATION",
+          "duration": 10,
+          "amplifier": 1
+        }
+      ],
+      "invulnerability_duration": 5,
+      "teleport_message": "&aHas reaparecido en la &eZona de Inicio"
+    },
+    {
+      "id": "warrior_temple",
+      "name": "Templo del Guerrero",
+      "description": "Zona de respawn para guerreros de alto nivel",
+      "world": "world",
+      "location": {
+        "x": 500,
+        "y": 70,
+        "z": 500,
+        "yaw": 180,
+        "pitch": 0
+      },
+      "radius": 30,
+      "is_default": false,
+      "require_permission": false,
+      "permission": "mmorpg.respawn.warrior",
+      "min_level": 20,
+      "class_requirement": "warrior",
+      "priority": 80,
+      "effects_on_spawn": [
+        {
+          "type": "DAMAGE_RESISTANCE",
+          "duration": 10,
+          "amplifier": 2
+        },
+        {
+          "type": "STRENGTH",
+          "duration": 30,
+          "amplifier": 1
+        }
+      ],
+      "invulnerability_duration": 8,
+      "teleport_message": "&cHas reaparecido en el &4Templo del Guerrero"
+    },
+    {
+      "id": "mage_tower",
+      "name": "Torre del Mago",
+      "description": "Zona de respawn para magos",
+      "world": "world",
+      "location": {
+        "x": -500,
+        "y": 100,
+        "z": 500,
+        "yaw": 90,
+        "pitch": 0
+      },
+      "radius": 25,
+      "is_default": false,
+      "require_permission": false,
+      "permission": "mmorpg.respawn.mage",
+      "min_level": 20,
+      "class_requirement": "mage",
+      "priority": 80,
+      "effects_on_spawn": [
+        {
+          "type": "DAMAGE_RESISTANCE",
+          "duration": 10,
+          "amplifier": 2
+        },
+        {
+          "type": "SPEED",
+          "duration": 30,
+          "amplifier": 1
+        }
+      ],
+      "invulnerability_duration": 8,
+      "teleport_message": "&5Has reaparecido en la &dTorre del Mago"
+    },
+    {
+      "id": "rogue_hideout",
+      "name": "Escondite del Pícaro",
+      "description": "Zona de respawn para pícaros",
+      "world": "world",
+      "location": {
+        "x": 500,
+        "y": 65,
+        "z": -500,
+        "yaw": 270,
+        "pitch": 0
+      },
+      "radius": 20,
+      "is_default": false,
+      "require_permission": false,
+      "permission": "mmorpg.respawn.rogue",
+      "min_level": 20,
+      "class_requirement": "rogue",
+      "priority": 80,
+      "effects_on_spawn": [
+        {
+          "type": "DAMAGE_RESISTANCE",
+          "duration": 10,
+          "amplifier": 2
+        },
+        {
+          "type": "INVISIBILITY",
+          "duration": 15,
+          "amplifier": 0
+        }
+      ],
+      "invulnerability_duration": 8,
+      "teleport_message": "&8Has reaparecido en el &0Escondite del Pícaro"
+    },
+    {
+      "id": "paladin_sanctum",
+      "name": "Santuario del Paladín",
+      "description": "Zona de respawn para paladines",
+      "world": "world",
+      "location": {
+        "x": -500,
+        "y": 75,
+        "z": -500,
+        "yaw": 45,
+        "pitch": 0
+      },
+      "radius": 35,
+      "is_default": false,
+      "require_permission": false,
+      "permission": "mmorpg.respawn.paladin",
+      "min_level": 20,
+      "class_requirement": "paladin",
+      "priority": 80,
+      "effects_on_spawn": [
+        {
+          "type": "DAMAGE_RESISTANCE",
+          "duration": 15,
+          "amplifier": 3
+        },
+        {
+          "type": "REGENERATION",
+          "duration": 20,
+          "amplifier": 2
+        }
+      ],
+      "invulnerability_duration": 10,
+      "teleport_message": "&eHas reaparecido en el &6Santuario del Paladín"
+    },
+    {
+      "id": "pvp_arena",
+      "name": "Arena PvP",
+      "description": "Zona de respawn en la arena PvP",
+      "world": "world",
+      "location": {
+        "x": 0,
+        "y": 70,
+        "z": 1000,
+        "yaw": 0,
+        "pitch": 0
+      },
+      "radius": 15,
+      "is_default": false,
+      "require_permission": true,
+      "permission": "mmorpg.respawn.pvp",
+      "priority": 90,
+      "effects_on_spawn": [
+        {
+          "type": "DAMAGE_RESISTANCE",
+          "duration": 3,
+          "amplifier": 1
+        }
+      ],
+      "invulnerability_duration": 3,
+      "teleport_message": "&cHas reaparecido en la &4Arena PvP"
+    }
+  ],
+  "death_settings": {
+    "keep_inventory": false,
+    "keep_xp": false,
+    "xp_loss_percentage": 10,
+    "coin_loss_percentage": 5,
+    "death_penalty_duration": 60,
+    "death_penalty_effects": [
+      {
+        "type": "WEAKNESS",
+        "duration": 60,
+        "amplifier": 0
+      }
+    ],
+    "respawn_cooldown": 0,
+    "show_death_message": true,
+    "broadcast_death": false,
+    "allow_revenge_marker": true,
+    "revenge_marker_duration": 300
+  },
+  "settings": {
+    "enable_custom_respawn": true,
+    "prioritize_class_spawn": true,
+    "prioritize_level_spawn": true,
+    "allow_bed_override": true,
+    "respawn_animation": true,
+    "particle_effects": true,
+    "sound_effects": true
+  }
+}

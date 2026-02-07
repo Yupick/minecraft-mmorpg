@@ -1,0 +1,369 @@
+{% extends "base.html" %}
+
+{% block title %}Logs{% endblock %}
+{% block page_title %}Visualizador de Logs{% endblock %}
+
+{% block extra_css %}
+<style>
+.log-viewer {
+    background: #000;
+    color: #e0e0e0;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    padding: 15px;
+    height: 600px;
+    overflow-y: auto;
+    border-radius: 5px;
+}
+
+.log-line {
+    margin: 3px 0;
+    padding: 2px 5px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.log-line:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.log-line.INFO { border-left: 3px solid #17a2b8; }
+.log-line.WARN { border-left: 3px solid #ffc107; background: rgba(255, 193, 7, 0.05); }
+.log-line.ERROR { border-left: 3px solid #dc3545; background: rgba(220, 53, 69, 0.05); }
+.log-line.DEBUG { border-left: 3px solid #6c757d; }
+.log-line.SUCCESS { border-left: 3px solid #28a745; }
+
+.log-timestamp {
+    color: #6c757d;
+    margin-right: 10px;
+}
+
+.log-level {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.log-level.INFO { color: #17a2b8; }
+.log-level.WARN { color: #ffc107; }
+.log-level.ERROR { color: #dc3545; }
+.log-level.DEBUG { color: #6c757d; }
+.log-level.SUCCESS { color: #28a745; }
+
+.filter-badge {
+    cursor: pointer;
+    margin: 2px;
+    transition: all 0.2s;
+}
+
+.filter-badge.active {
+    box-shadow: 0 0 10px currentColor;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon text-info">
+                <i class="fas fa-file-alt"></i>
+            </div>
+            <div class="stat-number" id="total-logs">0</div>
+            <div class="stat-label">Total de Líneas</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon text-danger">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="stat-number" id="error-count">0</div>
+            <div class="stat-label">Errores</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon text-warning">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <div class="stat-number" id="warn-count">0</div>
+            <div class="stat-label">Advertencias</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon text-primary">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-number" id="last-update">--:--</div>
+            <div class="stat-label">Última Actualización</div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="fas fa-filter"></i> Filtros</span>
+        <button class="btn btn-sm btn-secondary" onclick="clearFilters()">
+            <i class="fas fa-times"></i> Limpiar Filtros
+        </button>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Archivo de Log</label>
+                <select class="form-select" id="log-file" onchange="loadLogs()">
+                    <option value="latest">latest.log</option>
+                    <option value="panel">panel.log</option>
+                    <option value="error">error.log</option>
+                    <option value="debug">debug.log</option>
+                </select>
+            </div>
+            
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Buscar en Logs</label>
+                <input type="text" class="form-control" id="search-logs" 
+                       placeholder="Buscar texto..." oninput="filterLogs()">
+            </div>
+            
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Número de Líneas</label>
+                <select class="form-select" id="log-lines" onchange="loadLogs()">
+                    <option value="100">100 líneas</option>
+                    <option value="500" selected>500 líneas</option>
+                    <option value="1000">1000 líneas</option>
+                    <option value="all">Todas</option>
+                </select>
+            </div>
+        </div>
+        
+        <div>
+            <label class="form-label">Nivel de Log</label><br>
+            <span class="badge bg-info filter-badge active" data-level="INFO" onclick="toggleFilter('INFO')">
+                <i class="fas fa-check"></i> INFO
+            </span>
+            <span class="badge bg-warning filter-badge active" data-level="WARN" onclick="toggleFilter('WARN')">
+                <i class="fas fa-check"></i> WARN
+            </span>
+            <span class="badge bg-danger filter-badge active" data-level="ERROR" onclick="toggleFilter('ERROR')">
+                <i class="fas fa-check"></i> ERROR
+            </span>
+            <span class="badge bg-secondary filter-badge active" data-level="DEBUG" onclick="toggleFilter('DEBUG')">
+                <i class="fas fa-check"></i> DEBUG
+            </span>
+            <span class="badge bg-success filter-badge active" data-level="SUCCESS" onclick="toggleFilter('SUCCESS')">
+                <i class="fas fa-check"></i> SUCCESS
+            </span>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="fas fa-list"></i> Contenido del Log</span>
+        <div>
+            <button class="btn btn-sm btn-primary" onclick="loadLogs()">
+                <i class="fas fa-sync"></i> Recargar
+            </button>
+            <button class="btn btn-sm btn-warning" onclick="downloadLogs()">
+                <i class="fas fa-download"></i> Descargar
+            </button>
+            <button class="btn btn-sm btn-danger" onclick="clearServerLogs()">
+                <i class="fas fa-trash"></i> Limpiar Logs
+            </button>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="log-viewer" id="log-viewer">
+            <div class="text-center text-muted">
+                <i class="fas fa-spinner fa-spin"></i> Cargando logs...
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let allLogs = [];
+let activeLevels = new Set(['INFO', 'WARN', 'ERROR', 'DEBUG', 'SUCCESS']);
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadLogs();
+    
+    // Auto-actualizar cada 10 segundos
+    setInterval(loadLogs, 10000);
+});
+
+async function loadLogs() {
+    const file = document.getElementById('log-file').value;
+    const lines = document.getElementById('log-lines').value;
+    
+    try {
+        const response = await fetch(`/api/logs/${file}?lines=${lines}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            allLogs = data.logs;
+            displayLogs(allLogs);
+            updateStats(allLogs);
+            
+            document.getElementById('last-update').textContent = 
+                new Date().toLocaleTimeString();
+        }
+    } catch (error) {
+        console.error('Error cargando logs:', error);
+        document.getElementById('log-viewer').innerHTML = 
+            '<div class="text-danger">Error al cargar los logs</div>';
+    }
+}
+
+function displayLogs(logs) {
+    const viewer = document.getElementById('log-viewer');
+    
+    if (logs.length === 0) {
+        viewer.innerHTML = '<div class="text-center text-muted">No hay logs disponibles</div>';
+        return;
+    }
+    
+    viewer.innerHTML = logs.map((log, index) => {
+        const level = detectLogLevel(log);
+        
+        if (!activeLevels.has(level)) {
+            return '';
+        }
+        
+        const parts = parseLogLine(log);
+        
+        return `
+            <div class="log-line ${level}" data-index="${index}">
+                <span class="log-timestamp">${parts.timestamp}</span>
+                <span class="log-level ${level}">[${level}]</span>
+                <span class="log-message">${escapeHtml(parts.message)}</span>
+            </div>
+        `;
+    }).join('');
+    
+    // Auto-scroll al final
+    viewer.scrollTop = viewer.scrollHeight;
+}
+
+function detectLogLevel(log) {
+    if (log.includes('[ERROR]') || log.includes('ERROR:')) return 'ERROR';
+    if (log.includes('[WARN]') || log.includes('WARN:')) return 'WARN';
+    if (log.includes('[DEBUG]') || log.includes('DEBUG:')) return 'DEBUG';
+    if (log.includes('[SUCCESS]') || log.includes('SUCCESS:')) return 'SUCCESS';
+    return 'INFO';
+}
+
+function parseLogLine(log) {
+    // Intentar extraer timestamp y mensaje
+    const timestampMatch = log.match(/\[?(\d{2}:\d{2}:\d{2})\]?/);
+    const timestamp = timestampMatch ? timestampMatch[1] : '--:--:--';
+    
+    // Remover timestamp y nivel del mensaje
+    let message = log
+        .replace(/\[?\d{2}:\d{2}:\d{2}\]?/, '')
+        .replace(/\[(INFO|WARN|ERROR|DEBUG|SUCCESS)\]/, '')
+        .trim();
+    
+    return { timestamp, message };
+}
+
+function filterLogs() {
+    const search = document.getElementById('search-logs').value.toLowerCase();
+    
+    const filtered = search ? 
+        allLogs.filter(log => log.toLowerCase().includes(search)) : 
+        allLogs;
+    
+    displayLogs(filtered);
+}
+
+function toggleFilter(level) {
+    const badge = document.querySelector(`.filter-badge[data-level="${level}"]`);
+    
+    if (activeLevels.has(level)) {
+        activeLevels.delete(level);
+        badge.classList.remove('active');
+        badge.querySelector('i').className = 'fas fa-times';
+    } else {
+        activeLevels.add(level);
+        badge.classList.add('active');
+        badge.querySelector('i').className = 'fas fa-check';
+    }
+    
+    displayLogs(allLogs);
+}
+
+function clearFilters() {
+    activeLevels = new Set(['INFO', 'WARN', 'ERROR', 'DEBUG', 'SUCCESS']);
+    document.querySelectorAll('.filter-badge').forEach(badge => {
+        badge.classList.add('active');
+        badge.querySelector('i').className = 'fas fa-check';
+    });
+    document.getElementById('search-logs').value = '';
+    displayLogs(allLogs);
+}
+
+function updateStats(logs) {
+    document.getElementById('total-logs').textContent = logs.length;
+    
+    const errors = logs.filter(log => detectLogLevel(log) === 'ERROR').length;
+    const warnings = logs.filter(log => detectLogLevel(log) === 'WARN').length;
+    
+    document.getElementById('error-count').textContent = errors;
+    document.getElementById('warn-count').textContent = warnings;
+}
+
+async function downloadLogs() {
+    const file = document.getElementById('log-file').value;
+    window.location.href = `/api/logs/${file}/download`;
+}
+
+async function clearServerLogs() {
+    if (!confirm('¿Estás seguro de limpiar los logs del servidor? Esta acción no se puede deshacer.')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/logs/clear', {
+            method: 'POST'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showAlert('success', 'Logs limpiados correctamente');
+            loadLogs();
+        } else {
+            showAlert('danger', 'Error al limpiar logs');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showAlert('danger', 'Error de conexión');
+    }
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function showAlert(type, message) {
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${type} alert-dismissible fade show`;
+    alert.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.querySelector('.main-content').insertBefore(alert, document.querySelector('.main-content').firstChild);
+    
+    setTimeout(() => {
+        const bsAlert = new bootstrap.Alert(alert);
+        bsAlert.close();
+    }, 3000);
+}
+</script>
+{% endblock %}

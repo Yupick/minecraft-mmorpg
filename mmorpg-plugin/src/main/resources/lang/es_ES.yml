@@ -1,0 +1,151 @@
+# Español (España)
+language:
+  name: "Español"
+  code: "es_ES"
+
+# Mensajes generales
+general:
+  prefix: "&7[&6MMORPG&7]&r"
+  no_permission: "&cNo tienes permiso para usar esto."
+  player_only: "&cEste comando solo puede ser usado por jugadores."
+  config_reloaded: "&aConfiguración recargada exitosamente."
+  invalid_player: "&cJugador no encontrado: {player}"
+  error: "&cOcurrió un error. Contacta con un administrador."
+
+# Sistema de clases
+classes:
+  choose_prompt: "&eElige tu clase: &f/class <warrior|mage|rogue|paladin>"
+  already_chosen: "&cYa has elegido la clase &f{class}&c."
+  changed: "&aHas cambiado tu clase a &f{class}&a."
+  info_warrior: "&6Guerrero&7: Clase cuerpo a cuerpo con alta resistencia."
+  info_mage: "&6Mago&7: Clase de daño mágico a distancia."
+  info_rogue: "&6Pícaro&7: Clase ágil con ataques críticos."
+  info_paladin: "&6Paladín&7: Clase híbrida con curación y daño."
+  current: "&eTu clase actual: &f{class}"
+  stats: "&e--- Estadísticas de {class} ---\n&fVida: &c{health}\n&fManá: &9{mana}\n&fDaño: &6{damage}\n&fDefensa: &a{defense}"
+
+# Sistema de estadísticas
+stats:
+  title: "&e&l=== Estadísticas de {player} ==="
+  level: "&fNivel: &6{level}"
+  experience: "&fExperiencia: &b{exp}/{max_exp}"
+  health: "&fVida: &c{health}/{max_health}"
+  mana: "&fManá: &9{mana}/{max_mana}"
+  strength: "&fFuerza: &6{strength}"
+  intelligence: "&fInteligencia: &b{intelligence}"
+  dexterity: "&fDestreza: &a{dexterity}"
+  vitality: "&fVitalidad: &c{vitality}"
+  kills: "&fEliminaciones: &e{kills}"
+  deaths: "&fMuertes: &7{deaths}"
+  playtime: "&fTiempo jugado: &d{playtime}"
+
+# Sistema de economía
+economy:
+  balance: "&eTu balance: &6{coins} &emonedas"
+  not_enough: "&cNo tienes suficientes monedas. Necesitas: &f{amount}"
+  paid: "&aHas enviado &6{amount} monedas &aa &f{player}&a."
+  received: "&aHas recibido &6{amount} monedas &ade &f{player}&a."
+  invalid_amount: "&cCantidad inválida: {amount}"
+  cannot_pay_self: "&cNo puedes enviarte dinero a ti mismo."
+
+# Sistema de misiones
+quests:
+  list: "&e--- Misiones Activas ({count}/{max}) ---"
+  accept: "&aHas aceptado la misión: &f{quest}"
+  complete: "&a¡Misión completada! &f{quest}\n&eRecompensas: &6{coins} monedas, &b{exp} EXP"
+  failed: "&cMisión fallida: &f{quest}"
+  no_space: "&cNo puedes aceptar más misiones. Límite: {max}"
+  not_found: "&cMisión no encontrada: {quest}"
+  objective: "&7- {objective}: &e{current}/{required}"
+  track: "&eAhora rastreando: &f{quest}"
+  untrack: "&eDejado de rastrear: &f{quest}"
+
+# Sistema de NPCs
+npcs:
+  interact: "&e{npc}&f: {message}"
+  trade_open: "&aAbriendo comercio con &e{npc}&a..."
+  quest_available: "&e¡Misión disponible!"
+  quest_turn_in: "&a¡Misión completada!"
+
+# Sistema de crafteo
+crafting:
+  success: "&aHas creado: &f{item}"
+  failed: "&cNo puedes crear este objeto."
+  missing_materials: "&cTe faltan materiales:\n{materials}"
+  insufficient_level: "&cNivel requerido: {level}"
+  recipe_learned: "&aHas aprendido la receta: &f{recipe}"
+
+# Sistema de encantamientos
+enchantments:
+  applied: "&aEncantamiento aplicado: &f{enchant} {level}"
+  failed: "&cNo se pudo aplicar el encantamiento."
+  conflicting: "&cEste encantamiento es incompatible con: {conflicting}"
+  max_level: "&cYa tienes el nivel máximo de este encantamiento."
+
+# Sistema de mazmorras
+dungeons:
+  enter: "&aEntrando en la mazmorra: &f{dungeon}"
+  exit: "&eHas salido de la mazmorra."
+  complete: "&a¡Mazmorra completada!\n&eRecompensas: &6{coins} monedas, &b{exp} EXP"
+  wave: "&eOleada {wave}/{max_waves}"
+  boss_spawn: "&c¡JEFE APARECIDO! &f{boss}"
+  insufficient_level: "&cNivel mínimo requerido: {level}"
+
+# Sistema de invasiones
+invasions:
+  start: "&c¡INVASIÓN INICIADA! &f{invasion}\n&eDuración: {duration} minutos"
+  end: "&a¡Invasión completada! Recompensas: &6{coins} monedas"
+  wave: "&cOleada de invasión: {wave}/{max_waves}"
+  mob_killed: "&eEliminaste un invasor: &6+{coins} monedas, &b+{exp} EXP"
+
+# Sistema de mascotas
+pets:
+  spawn: "&aHas invocado a tu mascota: &f{pet}"
+  despawn: "&eHas retirado a tu mascota."
+  level_up: "&a¡Tu mascota ha subido de nivel! &f{pet} &aahora es nivel &6{level}&a."
+  feed: "&aHas alimentado a &f{pet}&a."
+  hungry: "&e¡Tu mascota tiene hambre!"
+  list: "&e--- Tus Mascotas ({count}) ---"
+
+# Sistema de escuadrones
+squads:
+  create: "&aHas creado el escuadrón: &f{squad}"
+  disband: "&cEscuadrón disuelto: &f{squad}"
+  invite: "&aHas invitado a &f{player} &aal escuadrón."
+  invited: "&e{player} &fte ha invitado a su escuadrón. &a/squad accept {squad}"
+  join: "&aTehas unido al escuadrón: &f{squad}"
+  leave: "&eHas abandonado el escuadrón: &f{squad}"
+  kick: "&cHas expulsado a &f{player} &cdel escuadrón."
+  kicked: "&cHas sido expulsado del escuadrón: &f{squad}"
+  promote: "&a{player} ha sido promovido a &f{rank}&a."
+  list: "&e--- Escuadrón {squad} ({members}/{max}) ---"
+  chat: "&b[S] &f{player}&7: {message}"
+  bank_deposit: "&aHas depositado &6{amount} monedas &aen el banco del escuadrón."
+  bank_withdraw: "&aHas retirado &6{amount} monedas &adel banco del escuadrón."
+  bank_balance: "&eBanco del escuadrón: &6{balance} monedas"
+  max_size: "&cEl escuadrón está lleno. Máximo: {max}"
+
+# Sistema de logros
+achievements:
+  unlocked: "&a¡Logro desbloqueado! &f{achievement}\n&e{description}\n&7Recompensas: &6{coins} monedas, &b{exp} EXP"
+  list: "&e--- Logros ({unlocked}/{total}) ---"
+  progress: "&f{achievement}&7: &e{progress}%"
+
+# Sistema de bestiario
+bestiary:
+  discovered: "&a¡Nueva entrada en el bestiario! &f{mob}"
+  list: "&e--- Bestiario ({discovered}/{total}) ---"
+  info: "&e--- {mob} ---\n&fVida: &c{health}\n&fDaño: &6{damage}\n&fDefensa: &a{defense}\n&fVeces eliminado: &e{kills}"
+
+# Sistema de respawn
+respawn:
+  set: "&aPunto de respawn establecido en: &f{zone}"
+  teleported: "&aTeletransportado a: &f{zone}"
+  zone_list: "&e--- Zonas de Respawn Disponibles ---"
+
+# Comandos admin
+admin:
+  give_coins: "&aHas dado &6{amount} monedas &aa &f{player}&a."
+  set_level: "&aHas establecido el nivel de &f{player} &aa &6{level}&a."
+  reload: "&aConfiguración recargada."
+  clear_data: "&cDatos de &f{player} &celiminados."

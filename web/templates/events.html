@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Eventos{% endblock %}
+{% block page_title %}Eventos{% endblock %}
+
+{% block content %}
+<div class="card p-4">
+    <h4>Eventos</h4>
+    <div class="mb-3">
+        <input id="event-name" class="form-control mb-2" placeholder="Nombre">
+        <input id="event-type" class="form-control mb-2" placeholder="Tipo (seasonal/boss/server)">
+        <input id="event-config" class="form-control mb-2" placeholder="Config JSON">
+        <button class="btn btn-primary" onclick="createEvent()">Crear Evento</button>
+    </div>
+    <ul id="events-list" class="list-group"></ul>
+</div>
+
+<script>
+async function loadEvents() {
+    const res = await fetch('/api/events');
+    const data = await res.json();
+    const list = document.getElementById('events-list');
+    list.innerHTML = '';
+    data.forEach(e => {
+        const item = document.createElement('li');
+        item.className = 'list-group-item';
+        item.textContent = `${e.name} (${e.type}) - ${e.status}`;
+        list.appendChild(item);
+    });
+}
+
+async function createEvent() {
+    const payload = {
+        name: document.getElementById('event-name').value,
+        type: document.getElementById('event-type').value,
+        config: document.getElementById('event-config').value
+    };
+    await fetch('/api/events/create', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)});
+    loadEvents();
+}
+
+loadEvents();
+</script>
+{% endblock %}

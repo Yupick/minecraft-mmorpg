@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Integraciones{% endblock %}
+{% block page_title %}Integraciones{% endblock %}
+
+{% block content %}
+<div class="card p-4">
+    <h4>Webhooks</h4>
+    <div class="mb-3">
+        <input id="hook-name" class="form-control mb-2" placeholder="Nombre">
+        <input id="hook-url" class="form-control mb-2" placeholder="URL">
+        <input id="hook-events" class="form-control mb-2" placeholder="Eventos (comma-separated)">
+        <button class="btn btn-primary" onclick="createWebhook()">Crear Webhook</button>
+    </div>
+    <ul id="hooks-list" class="list-group"></ul>
+</div>
+
+<script>
+async function loadWebhooks() {
+    const res = await fetch('/api/integrations/webhooks');
+    const data = await res.json();
+    const list = document.getElementById('hooks-list');
+    list.innerHTML = '';
+    data.forEach(h => {
+        const item = document.createElement('li');
+        item.className = 'list-group-item d-flex justify-content-between align-items-center';
+        item.textContent = `${h.name} - ${h.url}`;
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-sm btn-danger';
+        btn.textContent = 'Eliminar';
+        btn.onclick = () => deleteWebhook(h.id);
+        item.appendChild(btn);
+        list.appendChild(item);
+    });
+}
+
+async function createWebhook() {
+    const payload = {
+        name: document.getElementById('hook-name').value,
+        url: document.getElementById('hook-url').value,
+        events: document.getElementById('hook-events').value
+    };
+    await fetch('/api/integrations/webhooks/create', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)});
+    loadWebhooks();
+}
+
+async function deleteWebhook(id) {
+    await fetch(`/api/integrations/webhooks/${id}/delete`, {method: 'DELETE'});
+    loadWebhooks();
+}
+
+loadWebhooks();
+</script>
+{% endblock %}

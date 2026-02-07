@@ -1,0 +1,426 @@
+{% extends "base.html" %}
+
+{% block title %}Configuración{% endblock %}
+{% block page_title %}Configuración del Sistema{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-3 mb-4">
+        <div class="list-group">
+            <a href="#general" class="list-group-item list-group-item-action active" 
+               onclick="showConfigSection('general')">
+                <i class="fas fa-cog"></i> General
+            </a>
+            <a href="#gameplay" class="list-group-item list-group-item-action" 
+               onclick="showConfigSection('gameplay')">
+                <i class="fas fa-gamepad"></i> Gameplay
+            </a>
+            <a href="#economy" class="list-group-item list-group-item-action" 
+               onclick="showConfigSection('economy')">
+                <i class="fas fa-coins"></i> Economía
+            </a>
+            <a href="#database" class="list-group-item list-group-item-action" 
+               onclick="showConfigSection('database')">
+                <i class="fas fa-database"></i> Base de Datos
+            </a>
+            <a href="#security" class="list-group-item list-group-item-action" 
+               onclick="showConfigSection('security')">
+                <i class="fas fa-shield-alt"></i> Seguridad
+            </a>
+            <a href="#advanced" class="list-group-item list-group-item-action" 
+               onclick="showConfigSection('advanced')">
+                <i class="fas fa-wrench"></i> Avanzado
+            </a>
+        </div>
+    </div>
+    
+    <div class="col-md-9">
+        <!-- General -->
+        <div class="card config-section" id="section-general">
+            <div class="card-header">
+                <i class="fas fa-cog"></i> Configuración General
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label">Nombre del Servidor</label>
+                        <input type="text" class="form-control" id="server-name" value="MMORPG Server">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Idioma por Defecto</label>
+                        <select class="form-select" id="default-language">
+                            <option value="es" selected>Español</option>
+                            <option value="en">English</option>
+                            <option value="pt">Português</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Puerto del Panel Web</label>
+                        <input type="number" class="form-control" id="web-port" value="5000">
+                    </div>
+                    
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="debug-mode">
+                        <label class="form-check-label" for="debug-mode">
+                            Modo Debug (más logs en consola)
+                        </label>
+                    </div>
+                    
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="auto-backup" checked>
+                        <label class="form-check-label" for="auto-backup">
+                            Backups Automáticos (cada 6 horas)
+                        </label>
+                    </div>
+                    
+                    <button type="button" class="btn btn-primary" onclick="saveConfig('general')">
+                        <i class="fas fa-save"></i> Guardar Cambios
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Gameplay -->
+        <div class="card config-section" id="section-gameplay" style="display: none;">
+            <div class="card-header">
+                <i class="fas fa-gamepad"></i> Configuración de Gameplay
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Nivel Máximo</label>
+                            <input type="number" class="form-control" id="max-level" value="100">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">EXP por Nivel (base)</label>
+                            <input type="number" class="form-control" id="exp-per-level" value="100">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Multiplicador de EXP (%)</label>
+                        <input type="number" class="form-control" id="exp-multiplier" value="100">
+                        <small class="text-muted">100 = normal, 200 = doble EXP</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Multiplicador de Drop (%)</label>
+                        <input type="number" class="form-control" id="drop-multiplier" value="100">
+                    </div>
+                    
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="pvp-enabled" checked>
+                        <label class="form-check-label" for="pvp-enabled">
+                            PvP Habilitado
+                        </label>
+                    </div>
+                    
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="friendly-fire">
+                        <label class="form-check-label" for="friendly-fire">
+                            Fuego Amigo en Parties
+                        </label>
+                    </div>
+                    
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="keep-inventory" checked>
+                        <label class="form-check-label" for="keep-inventory">
+                            Mantener Inventario al Morir
+                        </label>
+                    </div>
+                    
+                    <button type="button" class="btn btn-primary" onclick="saveConfig('gameplay')">
+                        <i class="fas fa-save"></i> Guardar Cambios
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Economy -->
+        <div class="card config-section" id="section-economy" style="display: none;">
+            <div class="card-header">
+                <i class="fas fa-coins"></i> Configuración de Economía
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label">Monedas Iniciales</label>
+                        <input type="number" class="form-control" id="starting-coins" value="100" step="0.01">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Monedas por Nivel</label>
+                        <input type="number" class="form-control" id="coins-per-level" value="50" step="0.01">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Impuesto de Transacciones (%)</label>
+                        <input type="number" class="form-control" id="transaction-tax" value="5">
+                    </div>
+                    
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="daily-rewards" checked>
+                        <label class="form-check-label" for="daily-rewards">
+                            Recompensas Diarias Habilitadas
+                        </label>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Recompensa Diaria (monedas)</label>
+                        <input type="number" class="form-control" id="daily-reward-amount" value="25" step="0.01">
+                    </div>
+                    
+                    <button type="button" class="btn btn-primary" onclick="saveConfig('economy')">
+                        <i class="fas fa-save"></i> Guardar Cambios
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Database -->
+        <div class="card config-section" id="section-database" style="display: none;">
+            <div class="card-header">
+                <i class="fas fa-database"></i> Configuración de Base de Datos
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label">Tipo de Base de Datos</label>
+                        <select class="form-select" id="db-type">
+                            <option value="sqlite" selected>SQLite (Local)</option>
+                            <option value="mysql">MySQL</option>
+                            <option value="postgresql">PostgreSQL</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Ruta de la Base de Datos</label>
+                        <input type="text" class="form-control" id="db-path" 
+                               value="/opt/minecraft-mmorpg/data/universal.db" readonly>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Intervalo de Auto-guardado (segundos)</label>
+                        <input type="number" class="form-control" id="autosave-interval" value="300">
+                    </div>
+                    
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="db-backup" checked>
+                        <label class="form-check-label" for="db-backup">
+                            Backup de BD antes de actualizar
+                        </label>
+                    </div>
+                    
+                    <button type="button" class="btn btn-primary" onclick="saveConfig('database')">
+                        <i class="fas fa-save"></i> Guardar Cambios
+                    </button>
+                    <button type="button" class="btn btn-warning" onclick="vacuumDatabase()">
+                        <i class="fas fa-broom"></i> Optimizar BD
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Security -->
+        <div class="card config-section" id="section-security" style="display: none;">
+            <div class="card-header">
+                <i class="fas fa-shield-alt"></i> Configuración de Seguridad
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label">Contraseña del Panel Web</label>
+                        <input type="password" class="form-control" id="panel-password" 
+                               placeholder="Dejar vacío para no cambiar">
+                    </div>
+                    
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="whitelist-enabled">
+                        <label class="form-check-label" for="whitelist-enabled">
+                            Whitelist Habilitada
+                        </label>
+                    </div>
+                    
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="anti-cheat" checked>
+                        <label class="form-check-label" for="anti-cheat">
+                            Sistema Anti-Cheat Básico
+                        </label>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Intentos Máximos de Login</label>
+                        <input type="number" class="form-control" id="max-login-attempts" value="3">
+                    </div>
+                    
+                    <button type="button" class="btn btn-primary" onclick="saveConfig('security')">
+                        <i class="fas fa-save"></i> Guardar Cambios
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Advanced -->
+        <div class="card config-section" id="section-advanced" style="display: none;">
+            <div class="card-header">
+                <i class="fas fa-wrench"></i> Configuración Avanzada
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Advertencia:</strong> Cambiar estas opciones puede afectar el rendimiento del servidor.
+                </div>
+                
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label">Archivo de Configuración (JSON)</label>
+                        <textarea class="form-control font-monospace" id="config-json" rows="15">
+{
+  "server": {
+    "name": "MMORPG Server",
+    "port": 25565
+  },
+  "gameplay": {
+    "max_level": 100,
+    "exp_multiplier": 1.0
+  },
+  "economy": {
+    "starting_coins": 100.0,
+    "transaction_tax": 0.05
+  }
+}
+                        </textarea>
+                    </div>
+                    
+                    <button type="button" class="btn btn-primary" onclick="saveConfigJSON()">
+                        <i class="fas fa-save"></i> Guardar JSON
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="resetConfig()">
+                        <i class="fas fa-undo"></i> Restaurar Valores por Defecto
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function showConfigSection(section) {
+    // Ocultar todas las secciones
+    document.querySelectorAll('.config-section').forEach(el => {
+        el.style.display = 'none';
+    });
+    
+    // Mostrar la sección seleccionada
+    document.getElementById(`section-${section}`).style.display = 'block';
+    
+    // Actualizar navegación activa
+    document.querySelectorAll('.list-group-item').forEach(el => {
+        el.classList.remove('active');
+    });
+    event.target.classList.add('active');
+}
+
+async function saveConfig(section) {
+    // Recopilar datos del formulario según la sección
+    const configData = {};
+    
+    if (section === 'general') {
+        configData.server_name = document.getElementById('server-name').value;
+        configData.default_language = document.getElementById('default-language').value;
+        configData.web_port = parseInt(document.getElementById('web-port').value);
+        configData.debug_mode = document.getElementById('debug-mode').checked;
+        configData.auto_backup = document.getElementById('auto-backup').checked;
+    }
+    
+    try {
+        const response = await fetch(`/api/config/${section}`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(configData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showAlert('success', 'Configuración guardada correctamente');
+        } else {
+            showAlert('danger', 'Error al guardar configuración');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showAlert('danger', 'Error de conexión');
+    }
+}
+
+async function saveConfigJSON() {
+    const json = document.getElementById('config-json').value;
+    
+    try {
+        JSON.parse(json); // Validar JSON
+        
+        const response = await fetch('/api/config/json', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({config: json})
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showAlert('success', 'Configuración JSON guardada');
+        } else {
+            showAlert('danger', 'Error al guardar');
+        }
+    } catch (error) {
+        showAlert('danger', 'JSON inválido');
+    }
+}
+
+async function vacuumDatabase() {
+    if (!confirm('¿Optimizar la base de datos? Esto puede tardar unos minutos.')) return;
+    
+    try {
+        const response = await fetch('/api/database/vacuum', {
+            method: 'POST'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showAlert('success', 'Base de datos optimizada');
+        } else {
+            showAlert('danger', 'Error al optimizar');
+        }
+    } catch (error) {
+        showAlert('danger', 'Error de conexión');
+    }
+}
+
+function resetConfig() {
+    if (!confirm('¿Restaurar todos los valores por defecto? Esta acción no se puede deshacer.')) return;
+    
+    showAlert('info', 'Funcionalidad en desarrollo');
+}
+
+function showAlert(type, message) {
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${type} alert-dismissible fade show`;
+    alert.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.querySelector('.main-content').insertBefore(alert, document.querySelector('.main-content').firstChild);
+    
+    setTimeout(() => {
+        const bsAlert = new bootstrap.Alert(alert);
+        bsAlert.close();
+    }, 3000);
+}
+</script>
+{% endblock %}

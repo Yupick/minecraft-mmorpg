@@ -1,0 +1,3 @@
+# Este directorio contiene las bases de datos SQLite del servidor
+# - universal.db: Base de datos principal del servidor
+# - Configuraciones y datos persistentes del sistema MMORPG

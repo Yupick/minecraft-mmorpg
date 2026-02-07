@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Profesiones{% endblock %}
+{% block page_title %}Profesiones{% endblock %}
+
+{% block content %}
+<div class="card p-4">
+    <h4>Profesiones disponibles</h4>
+    <ul id="professions-list" class="list-group mb-4"></ul>
+
+    <h5>Actualizar progreso de jugador</h5>
+    <div class="row g-2">
+        <div class="col-md-3"><input id="prof-uuid" class="form-control" placeholder="UUID"></div>
+        <div class="col-md-2"><input id="prof-id" class="form-control" placeholder="ID Profesión"></div>
+        <div class="col-md-2"><input id="prof-level" class="form-control" placeholder="Nivel"></div>
+        <div class="col-md-2"><input id="prof-exp" class="form-control" placeholder="XP"></div>
+        <div class="col-md-3"><button class="btn btn-primary" onclick="updateProfession()">Guardar</button></div>
+    </div>
+</div>
+
+<script>
+async function loadProfessions() {
+    const res = await fetch('/api/professions');
+    const data = await res.json();
+    const list = document.getElementById('professions-list');
+    list.innerHTML = '';
+    data.forEach(p => {
+        const item = document.createElement('li');
+        item.className = 'list-group-item';
+        item.textContent = `${p.id} - ${p.name} (Max ${p.max_level})`;
+        list.appendChild(item);
+    });
+}
+
+async function updateProfession() {
+    const payload = {
+        uuid: document.getElementById('prof-uuid').value,
+        profession_id: parseInt(document.getElementById('prof-id').value || '0'),
+        level: parseInt(document.getElementById('prof-level').value || '1'),
+        experience: parseInt(document.getElementById('prof-exp').value || '0')
+    };
+    await fetch('/api/professions/update', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)});
+}
+
+loadProfessions();
+</script>
+{% endblock %}

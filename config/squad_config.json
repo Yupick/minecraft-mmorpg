@@ -1,0 +1,283 @@
+{
+  "settings": {
+    "enable_squad_system": true,
+    "max_squad_size": 10,
+    "min_squad_size": 2,
+    "max_squads_per_player": 1,
+    "squad_name_min_length": 3,
+    "squad_name_max_length": 20,
+    "squad_tag_min_length": 2,
+    "squad_tag_max_length": 5,
+    "creation_cost": 1000,
+    "rename_cost": 500,
+    "allow_friendly_fire": false
+  },
+  "benefits": {
+    "experience_sharing": {
+      "enabled": true,
+      "share_percentage": 0.5,
+      "range": 50.0,
+      "bonus_per_member": 0.05,
+      "max_bonus": 0.25
+    },
+    "damage_boost": {
+      "enabled": true,
+      "boost_per_member": 0.02,
+      "max_boost": 0.15,
+      "range": 30.0
+    },
+    "defense_boost": {
+      "enabled": true,
+      "boost_per_member": 0.02,
+      "max_boost": 0.15,
+      "range": 30.0
+    },
+    "health_regeneration": {
+      "enabled": true,
+      "regen_per_member": 0.01,
+      "max_regen": 0.1,
+      "range": 30.0
+    },
+    "resource_sharing": {
+      "enabled": true,
+      "share_coins": true,
+      "coin_share_percentage": 0.1,
+      "share_xp": true,
+      "xp_share_percentage": 0.1
+    }
+  },
+  "ranks": [
+    {
+      "id": "leader",
+      "name": "Líder",
+      "display_name": "&6[Líder]",
+      "priority": 100,
+      "permissions": [
+        "invite",
+        "kick",
+        "promote",
+        "demote",
+        "disband",
+        "rename",
+        "change_tag",
+        "manage_bank",
+        "toggle_pvp",
+        "set_home"
+      ],
+      "max_count": 1
+    },
+    {
+      "id": "officer",
+      "name": "Oficial",
+      "display_name": "&e[Oficial]",
+      "priority": 80,
+      "permissions": [
+        "invite",
+        "kick_member",
+        "manage_bank",
+        "toggle_pvp"
+      ],
+      "max_count": 3
+    },
+    {
+      "id": "veteran",
+      "name": "Veterano",
+      "display_name": "&b[Veterano]",
+      "priority": 60,
+      "permissions": [
+        "invite",
+        "use_bank"
+      ],
+      "max_count": -1,
+      "requirements": {
+        "days_in_squad": 30,
+        "contribution_points": 1000
+      }
+    },
+    {
+      "id": "member",
+      "name": "Miembro",
+      "display_name": "&a[Miembro]",
+      "priority": 40,
+      "permissions": [
+        "use_bank"
+      ],
+      "max_count": -1,
+      "requirements": {
+        "days_in_squad": 7
+      }
+    },
+    {
+      "id": "recruit",
+      "name": "Recluta",
+      "display_name": "&7[Recluta]",
+      "priority": 20,
+      "permissions": [],
+      "max_count": -1,
+      "is_default": true
+    }
+  ],
+  "progression": {
+    "enabled": true,
+    "squad_level_max": 50,
+    "xp_required_base": 1000,
+    "xp_multiplier": 1.5,
+    "benefits_per_level": {
+      "member_slots": 1,
+      "bank_size": 9,
+      "damage_boost": 0.01,
+      "defense_boost": 0.01
+    },
+    "level_milestones": [
+      {
+        "level": 10,
+        "rewards": {
+          "coins": 5000,
+          "unlock_feature": "squad_home"
+        }
+      },
+      {
+        "level": 25,
+        "rewards": {
+          "coins": 15000,
+          "unlock_feature": "squad_banner"
+        }
+      },
+      {
+        "level": 50,
+        "rewards": {
+          "coins": 50000,
+          "unlock_feature": "squad_perks"
+        }
+      }
+    ]
+  },
+  "bank": {
+    "enabled": true,
+    "initial_size": 27,
+    "max_size": 54,
+    "allow_coin_deposits": true,
+    "allow_coin_withdrawals": true,
+    "withdrawal_cooldown_hours": 24,
+    "transaction_logging": true
+  },
+  "chat": {
+    "enabled": true,
+    "chat_prefix": "&a[Squad] ",
+    "chat_format": "&7{rank} &f{player}&7: &f{message}",
+    "command_alias": "sc",
+    "show_in_tab": true,
+    "tab_prefix": "{squad_tag} "
+  },
+  "pvp": {
+    "allow_squad_pvp": false,
+    "friendly_fire_default": false,
+    "allow_toggle": true,
+    "pvp_protection_radius": 0
+  },
+  "features": {
+    "squad_home": {
+      "enabled": true,
+      "unlock_level": 10,
+      "set_home_cost": 1000,
+      "teleport_cooldown_seconds": 300,
+      "teleport_warmup_seconds": 5,
+      "cancel_on_damage": true
+    },
+    "squad_banner": {
+      "enabled": true,
+      "unlock_level": 25,
+      "allow_custom_patterns": true,
+      "banner_in_inventory": true
+    },
+    "squad_perks": {
+      "enabled": true,
+      "unlock_level": 50,
+      "available_perks": [
+        {
+          "id": "coin_boost",
+          "name": "Impulso de Oro",
+          "description": "Aumenta las monedas obtenidas en 10%",
+          "cost": 10000,
+          "effect_value": 0.1
+        },
+        {
+          "id": "xp_boost",
+          "name": "Impulso de Experiencia",
+          "description": "Aumenta la experiencia obtenida en 10%",
+          "cost": 10000,
+          "effect_value": 0.1
+        },
+        {
+          "id": "damage_boost",
+          "name": "Fuerza de Squad",
+          "description": "Aumenta el daño en 5%",
+          "cost": 15000,
+          "effect_value": 0.05
+        },
+        {
+          "id": "defense_boost",
+          "name": "Escudo de Squad",
+          "description": "Aumenta la defensa en 5%",
+          "cost": 15000,
+          "effect_value": 0.05
+        }
+      ],
+      "max_active_perks": 3
+    }
+  },
+  "contribution": {
+    "enabled": true,
+    "track_kills": true,
+    "track_quests": true,
+    "track_donations": true,
+    "points_per_kill": 1,
+    "points_per_quest": 10,
+    "points_per_coin_donated": 0.1,
+    "show_leaderboard": true,
+    "reward_top_contributors": true,
+    "weekly_reset": true
+  },
+  "events": {
+    "squad_vs_squad": {
+      "enabled": true,
+      "min_squads": 2,
+      "min_members_per_squad": 3,
+      "arena_required": true,
+      "rewards": {
+        "winning_squad": {
+          "coins_per_member": 1000,
+          "xp_per_member": 500,
+          "squad_xp": 5000
+        }
+      }
+    }
+  },
+  "display": {
+    "show_squad_tag_in_chat": true,
+    "show_squad_tag_in_nametag": true,
+    "nametag_format": "{squad_tag} &f{player}",
+    "scoreboard_enabled": true,
+    "scoreboard_title": "&6&lMi Squad",
+    "scoreboard_lines": [
+      "&7Squad: &f{squad_name}",
+      "&7Miembros: &a{online}&7/&f{max}",
+      "&7Nivel: &e{level}",
+      "&7XP: &b{xp}&7/&f{xp_required}",
+      "",
+      "&7Tu Rango: {rank}"
+    ]
+  },
+  "notifications": {
+    "member_join": "&a{player} &7se ha unido al squad",
+    "member_leave": "&c{player} &7ha dejado el squad",
+    "member_kick": "&c{player} &7ha sido expulsado del squad",
+    "member_promote": "&a{player} &7ha sido promovido a &e{rank}",
+    "member_demote": "&c{player} &7ha sido degradado a &e{rank}",
+    "squad_level_up": "&6&l¡NIVEL! &eEl squad ha alcanzado el nivel &6{level}",
+    "squad_disbanded": "&c&lEl squad ha sido disuelto",
+    "broadcast_creation": true,
+    "broadcast_level_up": true,
+    "broadcast_disbanding": false
+  }
+}

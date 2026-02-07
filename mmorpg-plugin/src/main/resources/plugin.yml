@@ -1,0 +1,159 @@
+name: MMORPGPlugin
+version: ${project.version}
+main: com.nightslayer.mmorpg.MMORPGPlugin
+api-version: '1.20'
+load: POSTWORLD
+author: NightSlayer
+description: Sistema MMORPG completo para Minecraft Paper
+website: https://github.com/tu-usuario/minecraft-mmorpg
+
+commands:
+  class:
+    description: Cambiar o ver tu clase RPG
+    usage: /<command> [warrior|mage|rogue|paladin]
+    permission: mmorpg.class
+    permission-message: No tienes permiso para usar este comando
+    aliases: [clase]
+  
+  quest:
+    description: Gestionar tus quests
+    usage: /<command> <list|start|progress|abandon> [quest_id]
+    permission: mmorpg.quest
+    permission-message: No tienes permiso para usar este comando
+    aliases: [q, misión]
+  
+  stats:
+    description: Ver tus estadísticas RPG
+    usage: /<command> [player]
+    permission: mmorpg.stats
+    permission-message: No tienes permiso para usar este comando
+    aliases: [estadísticas, rpgstats]
+  
+  balance:
+    description: Ver tu balance de monedas
+    usage: /<command> [player]
+    permission: mmorpg.balance
+    permission-message: No tienes permiso para usar este comando
+    aliases: [bal, money, coins, oro]
+  
+  pay:
+    description: Enviar monedas a otro jugador
+    usage: /<command> <player> <amount>
+    permission: mmorpg.pay
+    permission-message: No tienes permiso para usar este comando
+    aliases: [pagar]
+  
+  squad:
+    description: Gestionar tu squad/grupo
+    usage: /<command> <create|invite|leave|kick|info> [args]
+    permission: mmorpg.squad
+    permission-message: No tienes permiso para usar este comando
+    aliases: [group, grupo, clan]
+  
+  pets:
+    description: Gestionar tus pets/mascotas
+    usage: /<command> <list|summon|dismiss|info>
+    permission: mmorpg.pets
+    permission-message: No tienes permiso para usar este comando
+    aliases: [pet, mascota]
+  
+  bestiary:
+    description: Ver tu bestiario
+    usage: /<command> [mob_type]
+    permission: mmorpg.bestiary
+    permission-message: No tienes permiso para usar este comando
+    aliases: [bestiario]
+  
+  achievements:
+    description: Ver tus logros
+    usage: /<command> [category]
+    permission: mmorpg.achievements
+    permission-message: No tienes permiso para usar este comando
+    aliases: [logros, achievement]
+  
+  mmorpgadmin:
+    description: Comandos de administración del plugin
+    usage: /<command> <reload|migrate|debug> [args]
+    permission: mmorpg.admin
+    permission-message: No tienes permiso para usar este comando
+    aliases: [rpgadmin, madmin]
+
+permissions:
+  mmorpg.*:
+    description: Acceso a todas las funciones del plugin
+    default: op
+    children:
+      mmorpg.class: true
+      mmorpg.quest: true
+      mmorpg.stats: true
+      mmorpg.balance: true
+      mmorpg.pay: true
+      mmorpg.squad: true
+      mmorpg.pets: true
+      mmorpg.bestiary: true
+      mmorpg.achievements: true
+      mmorpg.admin: true
+  
+  mmorpg.class:
+    description: Permite cambiar de clase
+    default: true
+  
+  mmorpg.quest:
+    description: Permite usar el sistema de quests
+    default: true
+  
+  mmorpg.stats:
+    description: Permite ver estadísticas
+    default: true
+  
+  mmorpg.balance:
+    description: Permite ver balance de monedas
+    default: true
+  
+  mmorpg.pay:
+    description: Permite enviar monedas a otros jugadores
+    default: true
+  
+  mmorpg.squad:
+    description: Permite usar el sistema de squads
+    default: true
+  
+  mmorpg.pets:
+    description: Permite usar el sistema de pets
+    default: true
+  
+  mmorpg.bestiary:
+    description: Permite ver el bestiario
+    default: true
+  
+  mmorpg.achievements:
+    description: Permite ver logros
+    default: true
+  
+  mmorpg.admin:
+    description: Comandos de administración
+    default: op
+    children:
+      mmorpg.admin.reload: true
+      mmorpg.admin.migrate: true
+      mmorpg.admin.debug: true
+  
+  mmorpg.respawn.warrior:
+    description: Permite usar el respawn de guerreros
+    default: false
+  
+  mmorpg.respawn.mage:
+    description: Permite usar el respawn de magos
+    default: false
+  
+  mmorpg.respawn.rogue:
+    description: Permite usar el respawn de pícaros
+    default: false
+  
+  mmorpg.respawn.paladin:
+    description: Permite usar el respawn de paladines
+    default: false
+  
+  mmorpg.respawn.pvp:
+    description: Permite usar el respawn de PvP
+    default: false

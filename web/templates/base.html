@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Panel Admin{% endblock %} - MMORPG Server</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #7b68ee;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --dark-bg: #1a1a2e;
+            --sidebar-bg: #16213e;
+            --content-bg: #0f3460;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, var(--content-bg) 100%);
+            min-height: 100vh;
+            color: #e0e0e0;
+        }
+        
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 260px;
+            background: var(--sidebar-bg);
+            padding: 20px 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+            overflow-y: auto;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .sidebar-header h3 {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0 0 0;
+        }
+        
+        .sidebar-menu li {
+            margin: 0;
+        }
+        
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: #b0b0b0;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+        
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: rgba(74, 144, 226, 0.1);
+            color: #fff;
+            border-left-color: var(--primary-color);
+        }
+        
+        .sidebar-menu i {
+            width: 25px;
+            margin-right: 15px;
+            font-size: 18px;
+        }
+        
+        .main-content {
+            margin-left: 260px;
+            padding: 30px;
+            min-height: 100vh;
+        }
+        
+        .top-bar {
+            background: rgba(22, 33, 62, 0.8);
+            border-radius: 10px;
+            padding: 20px 30px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        
+        .page-title {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+            color: #fff;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        
+        .card {
+            background: rgba(22, 33, 62, 0.6);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+            color: #e0e0e0;
+        }
+        
+        .card-header {
+            background: rgba(74, 144, 226, 0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-weight: 600;
+            padding: 15px 20px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, var(--sidebar-bg) 0%, var(--content-bg) 100%);
+            border-radius: 10px;
+            padding: 25px;
+            text-align: center;
+            transition: transform 0.3s;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-number {
+            font-size: 36px;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            color: #b0b0b0;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+        
+        .stat-icon {
+            font-size: 48px;
+            opacity: 0.3;
+            margin-bottom: 10px;
+        }
+        
+        .btn-primary {
+            background: var(--primary-color);
+            border: none;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            background: #357abd;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(74, 144, 226, 0.3);
+        }
+        
+        .table {
+            color: #e0e0e0;
+        }
+        
+        .table thead {
+            background: rgba(74, 144, 226, 0.1);
+        }
+        
+        .table-striped tbody tr:nth-of-type(odd) {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        
+        .table-hover tbody tr:hover {
+            background: rgba(74, 144, 226, 0.1);
+        }
+        
+        .badge {
+            padding: 6px 12px;
+            font-weight: 500;
+        }
+        
+        .form-control,
+        .form-select {
+            background: rgba(22, 33, 62, 0.6);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #e0e0e0;
+        }
+        
+        .form-control:focus,
+        .form-select:focus {
+            background: rgba(22, 33, 62, 0.8);
+            border-color: var(--primary-color);
+            color: #fff;
+            box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+        }
+        
+        .modal-content {
+            background: var(--sidebar-bg);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .modal-header,
+        .modal-footer {
+            border-color: rgba(255,255,255,0.1);
+        }
+        
+        /* Scrollbar personalizado */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--dark-bg);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 5px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #357abd;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                left: -260px;
+            }
+            
+            .sidebar.active {
+                left: 0;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .mobile-toggle {
+                display: block !important;
+            }
+        }
+        
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Mobile Toggle Button -->
+    <button class="mobile-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+    
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3><i class="fas fa-gamepad"></i> MMORPG Panel</h3>
+        </div>
+        
+        <ul class="sidebar-menu">
+            <li>
+                <a href="/" class="{% if request.endpoint == 'index' %}active{% endif %}">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="/players" class="{% if request.endpoint == 'players' %}active{% endif %}">
+                    <i class="fas fa-users"></i>
+                    <span>Jugadores</span>
+                </a>
+            </li>
+            <li>
+                <a href="/economy" class="{% if request.endpoint == 'economy' %}active{% endif %}">
+                    <i class="fas fa-coins"></i>
+                    <span>Economía</span>
+                </a>
+            </li>
+            <li>
+                <a href="/quests" class="{% if request.endpoint == 'quests' %}active{% endif %}">
+                    <i class="fas fa-scroll"></i>
+                    <span>Misiones</span>
+                </a>
+            </li>
+            <li>
+                <a href="/mobs" class="{% if request.endpoint == 'mobs' %}active{% endif %}">
+                    <i class="fas fa-skull"></i>
+                    <span>Mobs</span>
+                </a>
+            </li>
+            <li>
+                <a href="/console" class="{% if request.endpoint == 'console' %}active{% endif %}">
+                    <i class="fas fa-terminal"></i>
+                    <span>Consola</span>
+                </a>
+            </li>
+            <li>
+                <a href="/config" class="{% if request.endpoint == 'config' %}active{% endif %}">
+                    <i class="fas fa-cog"></i>
+                    <span>Configuración</span>
+                </a>
+            </li>
+            <li>
+                <a href="/logs" class="{% if request.endpoint == 'logs' %}active{% endif %}">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Logs</span>
+                </a>
+            </li>
+            <li>
+                <a href="/social" class="{% if request.endpoint == 'social' %}active{% endif %}">
+                    <i class="fas fa-users"></i>
+                    <span>Sistemas Sociales</span>
+                </a>
+            </li>
+            <li>
+                <a href="/professions" class="{% if request.endpoint == 'professions' %}active{% endif %}">
+                    <i class="fas fa-hammer"></i>
+                    <span>Profesiones</span>
+                </a>
+            </li>
+            <li>
+                <a href="/pvp" class="{% if request.endpoint == 'pvp' %}active{% endif %}">
+                    <i class="fas fa-crosshairs"></i>
+                    <span>PvP</span>
+                </a>
+            </li>
+            <li>
+                <a href="/events" class="{% if request.endpoint == 'events' %}active{% endif %}">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Eventos</span>
+                </a>
+            </li>
+            <li>
+                <a href="/integrations" class="{% if request.endpoint == 'integrations' %}active{% endif %}">
+                    <i class="fas fa-plug"></i>
+                    <span>Integraciones</span>
+                </a>
+            </li>
+            <li>
+                <a href="/optimization" class="{% if request.endpoint == 'optimization' %}active{% endif %}">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Optimización</span>
+                </a>
+            </li>
+        </ul>
+        
+        <div style="position: absolute; bottom: 20px; left: 0; right: 0; padding: 0 20px;">
+            <div class="text-center" style="color: #666; font-size: 12px;">
+                <i class="fas fa-server"></i> Server v1.0.0<br>
+                <small>© 2024 MMORPG System</small>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <h1 class="page-title">{% block page_title %}Dashboard{% endblock %}</h1>
+            <div class="user-info">
+                <span><i class="fas fa-circle text-success"></i> Online</span>
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <!-- Page Content -->
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+        
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            var alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                var bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,334 @@
+{
+  "events": [
+    {
+      "id": "goblin_invasion",
+      "name": "Invasión de Goblins",
+      "description": "¡Una horda de goblins ataca el servidor!",
+      "type": "invasion",
+      "enabled": true,
+      "trigger_type": "scheduled",
+      "interval_hours": 6,
+      "duration_minutes": 20,
+      "announcement": {
+        "start_message": "&c¡INVASIÓN! &eUna horda de goblins está atacando!",
+        "end_message": "&a¡La invasión de goblins ha sido repelida!",
+        "wave_message": "&e¡Oleada {wave} de goblins!",
+        "broadcast": true,
+        "title": "&cINVASIÓN",
+        "subtitle": "&eGoblins atacan"
+      },
+      "waves": [
+        {
+          "wave_number": 1,
+          "spawn_count": 20,
+          "mobs": [
+            {
+              "type": "ZOMBIE",
+              "weight": 70,
+              "level_range": [5, 10],
+              "custom_name": "&aGoblin Invasor"
+            },
+            {
+              "type": "SKELETON",
+              "weight": 30,
+              "level_range": [5, 10],
+              "custom_name": "&aGoblin Arquero"
+            }
+          ],
+          "delay_seconds": 0
+        },
+        {
+          "wave_number": 2,
+          "spawn_count": 30,
+          "mobs": [
+            {
+              "type": "ZOMBIE",
+              "weight": 60,
+              "level_range": [10, 15],
+              "custom_name": "&aGoblin Guerrero"
+            },
+            {
+              "type": "SKELETON",
+              "weight": 30,
+              "level_range": [10, 15],
+              "custom_name": "&aGoblin Arquero"
+            },
+            {
+              "type": "CREEPER",
+              "weight": 10,
+              "level_range": [12, 15],
+              "custom_name": "&aGoblin Demoledor"
+            }
+          ],
+          "delay_seconds": 300
+        },
+        {
+          "wave_number": 3,
+          "spawn_count": 10,
+          "mobs": [
+            {
+              "type": "ZOMBIE",
+              "weight": 20,
+              "level_range": [20, 25],
+              "custom_name": "&cJefe Goblin",
+              "is_boss": true,
+              "health_multiplier": 3.0
+            },
+            {
+              "type": "ZOMBIE",
+              "weight": 80,
+              "level_range": [15, 20],
+              "custom_name": "&aGuardia de Elite"
+            }
+          ],
+          "delay_seconds": 600
+        }
+      ],
+      "rewards": {
+        "participant_rewards": {
+          "xp": 200,
+          "coins": 100
+        },
+        "top_damage_rewards": [
+          {
+            "rank": 1,
+            "xp": 1000,
+            "coins": 500,
+            "items": [
+              {
+                "material": "DIAMOND",
+                "amount": 5
+              }
+            ]
+          },
+          {
+            "rank": 2,
+            "xp": 700,
+            "coins": 350,
+            "items": [
+              {
+                "material": "DIAMOND",
+                "amount": 3
+              }
+            ]
+          },
+          {
+            "rank": 3,
+            "xp": 500,
+            "coins": 250,
+            "items": [
+              {
+                "material": "DIAMOND",
+                "amount": 2
+              }
+            ]
+          }
+        ]
+      },
+      "spawn_settings": {
+        "spawn_radius": 100,
+        "spawn_near_players": true,
+        "min_distance_from_player": 20,
+        "max_distance_from_player": 50
+      }
+    },
+    {
+      "id": "undead_rising",
+      "name": "Levantamiento de los Muertos",
+      "description": "Los muertos se levantan de sus tumbas",
+      "type": "invasion",
+      "enabled": true,
+      "trigger_type": "scheduled",
+      "interval_hours": 12,
+      "duration_minutes": 30,
+      "time_restriction": {
+        "only_night": true,
+        "start_time": 13000,
+        "end_time": 23000
+      },
+      "announcement": {
+        "start_message": "&4¡APOCALIPSIS! &cLos muertos caminan entre nosotros!",
+        "end_message": "&aLos muertos han vuelto a sus tumbas",
+        "wave_message": "&c¡Oleada {wave} de no-muertos!",
+        "broadcast": true,
+        "title": "&4APOCALIPSIS",
+        "subtitle": "&cNo-Muertos"
+      },
+      "waves": [
+        {
+          "wave_number": 1,
+          "spawn_count": 30,
+          "mobs": [
+            {
+              "type": "ZOMBIE",
+              "weight": 50,
+              "level_range": [15, 20],
+              "custom_name": "&2Zombi Resucitado"
+            },
+            {
+              "type": "SKELETON",
+              "weight": 30,
+              "level_range": [15, 20],
+              "custom_name": "&7Esqueleto Resucitado"
+            },
+            {
+              "type": "ZOMBIE_VILLAGER",
+              "weight": 20,
+              "level_range": [18, 22],
+              "custom_name": "&2Aldeano Zombi"
+            }
+          ],
+          "delay_seconds": 0
+        },
+        {
+          "wave_number": 2,
+          "spawn_count": 40,
+          "mobs": [
+            {
+              "type": "WITHER_SKELETON",
+              "weight": 40,
+              "level_range": [25, 30],
+              "custom_name": "&8Esqueleto Marchito"
+            },
+            {
+              "type": "ZOMBIE",
+              "weight": 40,
+              "level_range": [25, 30],
+              "custom_name": "&2Zombi Corrupto"
+            },
+            {
+              "type": "PHANTOM",
+              "weight": 20,
+              "level_range": [25, 30],
+              "custom_name": "&5Alma en Pena"
+            }
+          ],
+          "delay_seconds": 600
+        },
+        {
+          "wave_number": 3,
+          "spawn_count": 5,
+          "mobs": [
+            {
+              "type": "WITHER_SKELETON",
+              "weight": 100,
+              "level_range": [40, 45],
+              "custom_name": "&4Rey Liche",
+              "is_boss": true,
+              "health_multiplier": 5.0,
+              "damage_multiplier": 2.0
+            }
+          ],
+          "delay_seconds": 1200
+        }
+      ],
+      "rewards": {
+        "participant_rewards": {
+          "xp": 500,
+          "coins": 250
+        },
+        "top_damage_rewards": [
+          {
+            "rank": 1,
+            "xp": 2000,
+            "coins": 1000,
+            "items": [
+              {
+                "material": "NETHERITE_INGOT",
+                "amount": 2
+              }
+            ]
+          },
+          {
+            "rank": 2,
+            "xp": 1500,
+            "coins": 750,
+            "items": [
+              {
+                "material": "DIAMOND",
+                "amount": 10
+              }
+            ]
+          },
+          {
+            "rank": 3,
+            "xp": 1000,
+            "coins": 500,
+            "items": [
+              {
+                "material": "DIAMOND",
+                "amount": 5
+              }
+            ]
+          }
+        ]
+      },
+      "spawn_settings": {
+        "spawn_radius": 150,
+        "spawn_near_players": true,
+        "min_distance_from_player": 30,
+        "max_distance_from_player": 80
+      }
+    },
+    {
+      "id": "blood_moon",
+      "name": "Luna de Sangre",
+      "description": "Una noche maldita donde los mobs son más poderosos",
+      "type": "world_modifier",
+      "enabled": true,
+      "trigger_type": "random",
+      "probability": 0.1,
+      "check_interval_hours": 24,
+      "duration_minutes": 480,
+      "time_restriction": {
+        "only_night": true,
+        "start_time": 13000,
+        "end_time": 23000
+      },
+      "announcement": {
+        "start_message": "&4¡LUNA DE SANGRE! &cLos monstruos son más poderosos esta noche",
+        "end_message": "&aLa Luna de Sangre ha terminado",
+        "broadcast": true,
+        "title": "&4LUNA DE SANGRE",
+        "subtitle": "&cPeligro Extremo"
+      },
+      "effects": {
+        "mob_spawn_rate_multiplier": 2.0,
+        "mob_health_multiplier": 1.5,
+        "mob_damage_multiplier": 1.3,
+        "mob_speed_multiplier": 1.2,
+        "xp_multiplier": 2.0,
+        "coin_multiplier": 2.0,
+        "drop_rate_multiplier": 1.5,
+        "world_effects": [
+          {
+            "type": "SKY_COLOR",
+            "value": "RED"
+          },
+          {
+            "type": "FOG_COLOR",
+            "value": "DARK_RED"
+          }
+        ]
+      },
+      "rewards": {
+        "survival_reward": {
+          "xp": 1000,
+          "coins": 500,
+          "message": "&a¡Has sobrevivido a la Luna de Sangre!"
+        }
+      }
+    }
+  ],
+  "settings": {
+    "enable_events": true,
+    "enable_random_events": true,
+    "enable_scheduled_events": true,
+    "broadcast_event_start": true,
+    "broadcast_event_end": true,
+    "show_event_timer": true,
+    "show_event_scoreboard": true,
+    "allow_event_rewards": true,
+    "track_player_contribution": true
+  }
+}

@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Optimización{% endblock %}
+{% block page_title %}Optimización{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card p-4">
+            <h4>Métricas</h4>
+            <div class="mb-3">
+                <input id="metric-key" class="form-control mb-2" placeholder="Key">
+                <input id="metric-value" class="form-control mb-2" placeholder="Value">
+                <button class="btn btn-primary" onclick="recordMetric()">Registrar</button>
+            </div>
+            <ul id="metrics-list" class="list-group"></ul>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card p-4">
+            <h4>Backups</h4>
+            <div class="mb-3">
+                <input id="backup-path" class="form-control mb-2" placeholder="Ruta">
+                <input id="backup-size" class="form-control mb-2" placeholder="Tamaño">
+                <button class="btn btn-secondary" onclick="recordBackup()">Registrar Backup</button>
+                <button class="btn btn-outline-primary mt-2" onclick="runBackup()">Ejecutar backup</button>
+            </div>
+            <ul id="backups-list" class="list-group"></ul>
+        </div>
+    </div>
+</div>
+
+<script>
+async function loadMetrics() {
+    const res = await fetch('/api/optimization/metrics');
+    const data = await res.json();
+    const list = document.getElementById('metrics-list');
+    list.innerHTML = '';
+    data.forEach(m => {
+        const item = document.createElement('li');
+        item.className = 'list-group-item';
+        item.textContent = `${m.key}: ${m.value}`;
+        list.appendChild(item);
+    });
+}
+
+async function loadBackups() {
+    const res = await fetch('/api/optimization/backups');
+    const data = await res.json();
+    const list = document.getElementById('backups-list');
+    list.innerHTML = '';
+    data.forEach(b => {
+        const item = document.createElement('li');
+        item.className = 'list-group-item';
+        item.textContent = `${b.path} (${b.size} bytes) - ${b.status}`;
+        list.appendChild(item);
+    });
+}
+
+async function recordMetric() {
+    const payload = {
+        key: document.getElementById('metric-key').value,
+        value: parseFloat(document.getElementById('metric-value').value || '0')
+    };
+    await fetch('/api/optimization/metrics/record', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)});
+    loadMetrics();
+}
+
+async function recordBackup() {
+    const payload = {
+        path: document.getElementById('backup-path').value,
+        size: parseInt(document.getElementById('backup-size').value || '0')
+    };
+    await fetch('/api/optimization/backups/record', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)});
+    loadBackups();
+}
+
+async function runBackup() {
+    await fetch('/api/optimization/backups/run', {method: 'POST'});
+    loadBackups();
+}
+
+loadMetrics();
+loadBackups();
+</script>
+{% endblock %}

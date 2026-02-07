@@ -1,0 +1,286 @@
+{
+  "pets": [
+    {
+      "id": "wolf_companion",
+      "name": "Lobo Compañero",
+      "description": "Un lobo leal que lucha a tu lado",
+      "type": "WOLF",
+      "rarity": "common",
+      "base_health": 20.0,
+      "base_damage": 5.0,
+      "can_be_mount": false,
+      "min_level_required": 1,
+      "adoption_cost": 100,
+      "stats_per_level": {
+        "health": 2.0,
+        "damage": 0.5,
+        "speed": 0.01
+      },
+      "abilities": [
+        {
+          "id": "loyal_guardian",
+          "name": "Guardián Leal",
+          "description": "Aumenta la defensa del dueño",
+          "unlock_level": 5,
+          "effect_type": "PASSIVE",
+          "effect_value": 0.1
+        },
+        {
+          "id": "pack_hunter",
+          "name": "Cazador en Manada",
+          "description": "Aumenta el daño si hay más lobos cerca",
+          "unlock_level": 10,
+          "effect_type": "PASSIVE",
+          "effect_value": 0.15
+        }
+      ],
+      "food_preference": [
+        "BEEF",
+        "PORKCHOP",
+        "MUTTON",
+        "CHICKEN"
+      ]
+    },
+    {
+      "id": "cat_companion",
+      "name": "Gato Compañero",
+      "description": "Un gato que trae buena suerte",
+      "type": "CAT",
+      "rarity": "common",
+      "base_health": 10.0,
+      "base_damage": 2.0,
+      "can_be_mount": false,
+      "min_level_required": 1,
+      "adoption_cost": 50,
+      "stats_per_level": {
+        "health": 1.0,
+        "damage": 0.3,
+        "speed": 0.02
+      },
+      "abilities": [
+        {
+          "id": "lucky_charm",
+          "name": "Amuleto de Suerte",
+          "description": "Aumenta la probabilidad de drops raros",
+          "unlock_level": 5,
+          "effect_type": "PASSIVE",
+          "effect_value": 0.05
+        },
+        {
+          "id": "creeper_repellent",
+          "name": "Repelente de Creepers",
+          "description": "Los creepers evitan al dueño",
+          "unlock_level": 10,
+          "effect_type": "PASSIVE",
+          "effect_value": 10.0
+        }
+      ],
+      "food_preference": [
+        "COD",
+        "SALMON",
+        "TROPICAL_FISH"
+      ]
+    },
+    {
+      "id": "horse_mount",
+      "name": "Caballo de Guerra",
+      "description": "Un caballo veloz para viajar",
+      "type": "HORSE",
+      "rarity": "uncommon",
+      "base_health": 30.0,
+      "base_damage": 0.0,
+      "can_be_mount": true,
+      "mount_speed": 1.5,
+      "min_level_required": 10,
+      "adoption_cost": 500,
+      "stats_per_level": {
+        "health": 3.0,
+        "damage": 0.0,
+        "speed": 0.05
+      },
+      "abilities": [
+        {
+          "id": "swift_gallop",
+          "name": "Galope Veloz",
+          "description": "Aumenta la velocidad de movimiento",
+          "unlock_level": 5,
+          "effect_type": "PASSIVE",
+          "effect_value": 0.2
+        },
+        {
+          "id": "endurance",
+          "name": "Resistencia",
+          "description": "Reduce el daño recibido mientras montas",
+          "unlock_level": 15,
+          "effect_type": "PASSIVE",
+          "effect_value": 0.15
+        }
+      ],
+      "food_preference": [
+        "HAY_BLOCK",
+        "APPLE",
+        "GOLDEN_APPLE",
+        "GOLDEN_CARROT"
+      ]
+    },
+    {
+      "id": "parrot_companion",
+      "name": "Loro Explorador",
+      "description": "Un loro que ayuda a detectar enemigos",
+      "type": "PARROT",
+      "rarity": "rare",
+      "base_health": 6.0,
+      "base_damage": 1.0,
+      "can_be_mount": false,
+      "min_level_required": 15,
+      "adoption_cost": 300,
+      "stats_per_level": {
+        "health": 0.5,
+        "damage": 0.2,
+        "speed": 0.01
+      },
+      "abilities": [
+        {
+          "id": "enemy_detection",
+          "name": "Detección de Enemigos",
+          "description": "Alerta sobre enemigos cercanos",
+          "unlock_level": 5,
+          "effect_type": "ACTIVE",
+          "effect_value": 20.0,
+          "cooldown_seconds": 60
+        },
+        {
+          "id": "treasure_hunter",
+          "name": "Cazador de Tesoros",
+          "description": "Señala cofres cercanos",
+          "unlock_level": 10,
+          "effect_type": "ACTIVE",
+          "effect_value": 30.0,
+          "cooldown_seconds": 120
+        }
+      ],
+      "food_preference": [
+        "WHEAT_SEEDS",
+        "MELON_SEEDS",
+        "PUMPKIN_SEEDS",
+        "BEETROOT_SEEDS"
+      ]
+    },
+    {
+      "id": "dragon_pet",
+      "name": "Dragoncillo",
+      "description": "Un pequeño dragón con gran poder",
+      "type": "ENDER_DRAGON",
+      "rarity": "legendary",
+      "base_health": 50.0,
+      "base_damage": 15.0,
+      "can_be_mount": true,
+      "mount_speed": 2.0,
+      "min_level_required": 50,
+      "adoption_cost": 5000,
+      "stats_per_level": {
+        "health": 5.0,
+        "damage": 1.0,
+        "speed": 0.03
+      },
+      "abilities": [
+        {
+          "id": "fire_breath",
+          "name": "Aliento de Fuego",
+          "description": "Lanza una bola de fuego",
+          "unlock_level": 10,
+          "effect_type": "ACTIVE",
+          "effect_value": 30.0,
+          "cooldown_seconds": 30
+        },
+        {
+          "id": "dragon_scales",
+          "name": "Escamas de Dragón",
+          "description": "Aumenta la defensa del dueño",
+          "unlock_level": 20,
+          "effect_type": "PASSIVE",
+          "effect_value": 0.25
+        },
+        {
+          "id": "flight",
+          "name": "Vuelo",
+          "description": "Permite volar mientras montas",
+          "unlock_level": 30,
+          "effect_type": "PASSIVE",
+          "effect_value": 1.0
+        }
+      ],
+      "food_preference": [
+        "GOLDEN_APPLE",
+        "ENCHANTED_GOLDEN_APPLE",
+        "NETHERITE_INGOT"
+      ]
+    },
+    {
+      "id": "fox_companion",
+      "name": "Zorro Astuto",
+      "description": "Un zorro inteligente que recoge objetos",
+      "type": "FOX",
+      "rarity": "uncommon",
+      "base_health": 15.0,
+      "base_damage": 3.0,
+      "can_be_mount": false,
+      "min_level_required": 8,
+      "adoption_cost": 200,
+      "stats_per_level": {
+        "health": 1.5,
+        "damage": 0.4,
+        "speed": 0.02
+      },
+      "abilities": [
+        {
+          "id": "item_collector",
+          "name": "Recolector",
+          "description": "Recoge objetos cercanos automáticamente",
+          "unlock_level": 5,
+          "effect_type": "PASSIVE",
+          "effect_value": 10.0
+        },
+        {
+          "id": "stealth",
+          "name": "Sigilo",
+          "description": "Aumenta la probabilidad de esquivar",
+          "unlock_level": 12,
+          "effect_type": "PASSIVE",
+          "effect_value": 0.1
+        }
+      ],
+      "food_preference": [
+        "SWEET_BERRIES",
+        "CHICKEN",
+        "RABBIT"
+      ]
+    }
+  ],
+  "rarity_colors": {
+    "common": "&f",
+    "uncommon": "&a",
+    "rare": "&9",
+    "epic": "&5",
+    "legendary": "&6"
+  },
+  "settings": {
+    "enable_pet_system": true,
+    "max_pets_per_player": 5,
+    "max_active_pets": 1,
+    "pet_level_scaling": true,
+    "pet_experience_enabled": true,
+    "pet_death_enabled": false,
+    "pet_respawn_time_seconds": 300,
+    "pet_follow_distance": 5.0,
+    "pet_teleport_distance": 20.0,
+    "enable_pet_inventory": true,
+    "pet_inventory_size": 9,
+    "enable_pet_naming": true,
+    "pet_name_max_length": 20,
+    "food_healing_percentage": 0.2,
+    "training_xp_per_kill": 10,
+    "mount_dismount_cooldown": 3,
+    "broadcast_legendary_adoption": true
+  }
+}

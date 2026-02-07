@@ -1,0 +1,371 @@
+{% extends "base.html" %}
+
+{% block title %}Mobs{% endblock %}
+{% block page_title %}Gestión de Mobs{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon text-danger">
+                <i class="fas fa-skull-crossbones"></i>
+            </div>
+            <div class="stat-number" id="total-mobs">0</div>
+            <div class="stat-label">Mobs Configurados</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon text-warning">
+                <i class="fas fa-dragon"></i>
+            </div>
+            <div class="stat-number" id="boss-mobs">0</div>
+            <div class="stat-label">Jefes</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon text-success">
+                <i class="fas fa-heart"></i>
+            </div>
+            <div class="stat-number" id="avg-health">0</div>
+            <div class="stat-label">HP Promedio</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon text-info">
+                <i class="fas fa-coins"></i>
+            </div>
+            <div class="stat-number" id="avg-rewards">0</div>
+            <div class="stat-label">Recompensa Promedio</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="fas fa-list"></i> Lista de Mobs</span>
+        <div>
+            <input type="text" id="search-mob" class="form-control form-control-sm" 
+                   placeholder="Buscar mob..." style="width: 250px; display: inline-block;">
+            <button class="btn btn-sm btn-primary ms-2" onclick="loadMobs()">
+                <i class="fas fa-sync"></i> Actualizar
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Tipo</th>
+                        <th>Nivel</th>
+                        <th>HP</th>
+                        <th>Daño</th>
+                        <th>Velocidad</th>
+                        <th>Recompensas</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="mobs-table">
+                    <tr>
+                        <td colspan="9" class="text-center">
+                            <i class="fas fa-spinner fa-spin"></i> Cargando...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal editar mob -->
+<div class="modal fade" id="editMobModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-edit"></i> Editar Mob</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-mob-form">
+                    <input type="hidden" id="edit-mob-id">
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Nombre del Mob</label>
+                            <input type="text" class="form-control" id="edit-mob-name" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Tipo de Entidad</label>
+                            <input type="text" class="form-control" id="edit-mob-type" readonly>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Nivel</label>
+                            <input type="number" class="form-control" id="edit-mob-level" min="1">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">HP</label>
+                            <input type="number" class="form-control" id="edit-mob-health" min="1" step="0.1">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Daño</label>
+                            <input type="number" class="form-control" id="edit-mob-damage" min="0" step="0.1">
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Velocidad</label>
+                            <input type="number" class="form-control" id="edit-mob-speed" min="0" step="0.01">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Defensa</label>
+                            <input type="number" class="form-control" id="edit-mob-defense" min="0" step="0.1">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Experiencia</label>
+                            <input type="number" class="form-control" id="edit-mob-exp" min="0">
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Monedas (min)</label>
+                            <input type="number" class="form-control" id="edit-mob-coins-min" 
+                                   min="0" step="0.01">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Monedas (max)</label>
+                            <input type="number" class="form-control" id="edit-mob-coins-max" 
+                                   min="0" step="0.01">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Items Drop (JSON)</label>
+                        <textarea class="form-control font-monospace" id="edit-mob-drops" rows="3"
+                                  placeholder='[{"item": "DIAMOND", "chance": 0.1, "amount": 1}]'></textarea>
+                        <small class="text-muted">
+                            Formato: [{"item": "MATERIAL", "chance": 0.0-1.0, "amount": cantidad}]
+                        </small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Habilidades (JSON)</label>
+                        <textarea class="form-control font-monospace" id="edit-mob-abilities" rows="3"
+                                  placeholder='["FIREBALL", "TELEPORT"]'></textarea>
+                        <small class="text-muted">
+                            Lista de habilidades especiales del mob
+                        </small>
+                    </div>
+                    
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="edit-mob-boss">
+                        <label class="form-check-label" for="edit-mob-boss">
+                            <i class="fas fa-crown text-warning"></i> Es un Jefe
+                        </label>
+                    </div>
+                    
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="edit-mob-aggressive">
+                        <label class="form-check-label" for="edit-mob-aggressive">
+                            <i class="fas fa-fire text-danger"></i> Agresivo por defecto
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="saveMob()">
+                    <i class="fas fa-save"></i> Guardar Cambios
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let mobsData = [];
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadMobs();
+    document.getElementById('search-mob').addEventListener('input', filterMobs);
+    setInterval(loadMobs, 30000);
+});
+
+async function loadMobs() {
+    try {
+        const response = await fetch('/api/mobs');
+        const data = await response.json();
+        
+        if (data.success) {
+            mobsData = data.mobs;
+            displayMobs(mobsData);
+            updateStats(mobsData);
+        }
+    } catch (error) {
+        console.error('Error cargando mobs:', error);
+    }
+}
+
+function displayMobs(mobs) {
+    const tbody = document.getElementById('mobs-table');
+    
+    if (mobs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center">No hay mobs configurados</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = mobs.map(mob => `
+        <tr>
+            <td><span class="badge bg-dark">${mob.id}</span></td>
+            <td>
+                <strong>${mob.name}</strong>
+                ${mob.is_boss ? '<i class="fas fa-crown text-warning ms-1" title="Jefe"></i>' : ''}
+            </td>
+            <td>
+                <span class="badge ${getMobTypeBadge(mob.entity_type)}">
+                    ${mob.entity_type}
+                </span>
+            </td>
+            <td>Nivel ${mob.level}</td>
+            <td>
+                <i class="fas fa-heart text-danger"></i> ${mob.health.toFixed(1)}
+            </td>
+            <td>
+                <i class="fas fa-sword text-warning"></i> ${mob.damage.toFixed(1)}
+            </td>
+            <td>
+                <i class="fas fa-running text-info"></i> ${mob.speed.toFixed(2)}
+            </td>
+            <td>
+                <small>
+                    <i class="fas fa-coins text-warning"></i> ${mob.coins_min}-${mob.coins_max}<br>
+                    <i class="fas fa-star text-info"></i> ${mob.exp_reward} EXP
+                </small>
+            </td>
+            <td>
+                <button class="btn btn-sm btn-primary" onclick="editMob(${mob.id})" title="Editar">
+                    <i class="fas fa-edit"></i>
+                </button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function getMobTypeBadge(type) {
+    const hostile = ['ZOMBIE', 'SKELETON', 'CREEPER', 'SPIDER', 'ENDERMAN', 'BLAZE', 'WITHER', 'ENDER_DRAGON'];
+    return hostile.includes(type) ? 'bg-danger' : 'bg-success';
+}
+
+function filterMobs() {
+    const search = document.getElementById('search-mob').value.toLowerCase();
+    const filtered = mobsData.filter(m => 
+        m.name.toLowerCase().includes(search) || 
+        m.entity_type.toLowerCase().includes(search)
+    );
+    displayMobs(filtered);
+}
+
+function updateStats(mobs) {
+    document.getElementById('total-mobs').textContent = mobs.length;
+    document.getElementById('boss-mobs').textContent = mobs.filter(m => m.is_boss).length;
+    
+    const avgHealth = mobs.length > 0 ? 
+        Math.round(mobs.reduce((sum, m) => sum + m.health, 0) / mobs.length) : 0;
+    document.getElementById('avg-health').textContent = avgHealth;
+    
+    const avgReward = mobs.length > 0 ? 
+        ((mobs.reduce((sum, m) => sum + m.coins_min + m.coins_max, 0) / 2) / mobs.length).toFixed(1) : 0;
+    document.getElementById('avg-rewards').textContent = avgReward;
+}
+
+function editMob(id) {
+    const mob = mobsData.find(m => m.id === id);
+    if (!mob) return;
+    
+    document.getElementById('edit-mob-id').value = mob.id;
+    document.getElementById('edit-mob-name').value = mob.name;
+    document.getElementById('edit-mob-type').value = mob.entity_type;
+    document.getElementById('edit-mob-level').value = mob.level;
+    document.getElementById('edit-mob-health').value = mob.health;
+    document.getElementById('edit-mob-damage').value = mob.damage;
+    document.getElementById('edit-mob-speed').value = mob.speed;
+    document.getElementById('edit-mob-defense').value = mob.defense || 0;
+    document.getElementById('edit-mob-exp').value = mob.exp_reward;
+    document.getElementById('edit-mob-coins-min').value = mob.coins_min;
+    document.getElementById('edit-mob-coins-max').value = mob.coins_max;
+    document.getElementById('edit-mob-drops').value = 
+        mob.drops ? JSON.stringify(JSON.parse(mob.drops), null, 2) : '[]';
+    document.getElementById('edit-mob-abilities').value = 
+        mob.abilities ? JSON.stringify(JSON.parse(mob.abilities), null, 2) : '[]';
+    document.getElementById('edit-mob-boss').checked = mob.is_boss;
+    document.getElementById('edit-mob-aggressive').checked = mob.is_aggressive;
+    
+    new bootstrap.Modal(document.getElementById('editMobModal')).show();
+}
+
+async function saveMob() {
+    const id = document.getElementById('edit-mob-id').value;
+    const updates = {
+        level: parseInt(document.getElementById('edit-mob-level').value),
+        health: parseFloat(document.getElementById('edit-mob-health').value),
+        damage: parseFloat(document.getElementById('edit-mob-damage').value),
+        speed: parseFloat(document.getElementById('edit-mob-speed').value),
+        defense: parseFloat(document.getElementById('edit-mob-defense').value),
+        exp_reward: parseInt(document.getElementById('edit-mob-exp').value),
+        coins_min: parseFloat(document.getElementById('edit-mob-coins-min').value),
+        coins_max: parseFloat(document.getElementById('edit-mob-coins-max').value),
+        drops: document.getElementById('edit-mob-drops').value,
+        abilities: document.getElementById('edit-mob-abilities').value,
+        is_boss: document.getElementById('edit-mob-boss').checked,
+        is_aggressive: document.getElementById('edit-mob-aggressive').checked
+    };
+    
+    try {
+        const response = await fetch(`/api/mobs/${id}`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(updates)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            bootstrap.Modal.getInstance(document.getElementById('editMobModal')).hide();
+            loadMobs();
+            showAlert('success', 'Mob actualizado correctamente');
+        } else {
+            showAlert('danger', 'Error al actualizar mob');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showAlert('danger', 'Error de conexión o JSON inválido');
+    }
+}
+
+function showAlert(type, message) {
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${type} alert-dismissible fade show`;
+    alert.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.querySelector('.main-content').insertBefore(alert, document.querySelector('.main-content').firstChild);
+    
+    setTimeout(() => {
+        const bsAlert = new bootstrap.Alert(alert);
+        bsAlert.close();
+    }, 3000);
+}
+</script>
+{% endblock %}

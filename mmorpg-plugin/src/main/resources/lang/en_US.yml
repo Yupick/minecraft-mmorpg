@@ -1,0 +1,151 @@
+# English (United States)
+language:
+  name: "English"
+  code: "en_US"
+
+# General messages
+general:
+  prefix: "&7[&6MMORPG&7]&r"
+  no_permission: "&cYou don't have permission to use this."
+  player_only: "&cThis command can only be used by players."
+  config_reloaded: "&aConfiguration reloaded successfully."
+  invalid_player: "&cPlayer not found: {player}"
+  error: "&cAn error occurred. Contact an administrator."
+
+# Class system
+classes:
+  choose_prompt: "&eChoose your class: &f/class <warrior|mage|rogue|paladin>"
+  already_chosen: "&cYou have already chosen the &f{class}&c class."
+  changed: "&aYou have changed your class to &f{class}&a."
+  info_warrior: "&6Warrior&7: Melee class with high endurance."
+  info_mage: "&6Mage&7: Ranged magical damage class."
+  info_rogue: "&6Rogue&7: Agile class with critical attacks."
+  info_paladin: "&6Paladin&7: Hybrid class with healing and damage."
+  current: "&eYour current class: &f{class}"
+  stats: "&e--- {class} Stats ---\n&fHealth: &c{health}\n&fMana: &9{mana}\n&fDamage: &6{damage}\n&fDefense: &a{defense}"
+
+# Stats system
+stats:
+  title: "&e&l=== {player} Stats ==="
+  level: "&fLevel: &6{level}"
+  experience: "&fExperience: &b{exp}/{max_exp}"
+  health: "&fHealth: &c{health}/{max_health}"
+  mana: "&fMana: &9{mana}/{max_mana}"
+  strength: "&fStrength: &6{strength}"
+  intelligence: "&fIntelligence: &b{intelligence}"
+  dexterity: "&fDexterity: &a{dexterity}"
+  vitality: "&fVitality: &c{vitality}"
+  kills: "&fKills: &e{kills}"
+  deaths: "&fDeaths: &7{deaths}"
+  playtime: "&fPlaytime: &d{playtime}"
+
+# Economy system
+economy:
+  balance: "&eYour balance: &6{coins} &ecoins"
+  not_enough: "&cYou don't have enough coins. Required: &f{amount}"
+  paid: "&aYou sent &6{amount} coins &ato &f{player}&a."
+  received: "&aYou received &6{amount} coins &afrom &f{player}&a."
+  invalid_amount: "&cInvalid amount: {amount}"
+  cannot_pay_self: "&cYou cannot pay yourself."
+
+# Quest system
+quests:
+  list: "&e--- Active Quests ({count}/{max}) ---"
+  accept: "&aYou accepted the quest: &f{quest}"
+  complete: "&aQuest completed! &f{quest}\n&eRewards: &6{coins} coins, &b{exp} EXP"
+  failed: "&cQuest failed: &f{quest}"
+  no_space: "&cYou cannot accept more quests. Limit: {max}"
+  not_found: "&cQuest not found: {quest}"
+  objective: "&7- {objective}: &e{current}/{required}"
+  track: "&eNow tracking: &f{quest}"
+  untrack: "&eStopped tracking: &f{quest}"
+
+# NPC system
+npcs:
+  interact: "&e{npc}&f: {message}"
+  trade_open: "&aOpening trade with &e{npc}&a..."
+  quest_available: "&eQuest available!"
+  quest_turn_in: "&aQuest completed!"
+
+# Crafting system
+crafting:
+  success: "&aYou crafted: &f{item}"
+  failed: "&cYou cannot craft this item."
+  missing_materials: "&cMissing materials:\n{materials}"
+  insufficient_level: "&cRequired level: {level}"
+  recipe_learned: "&aYou learned the recipe: &f{recipe}"
+
+# Enchantment system
+enchantments:
+  applied: "&aEnchantment applied: &f{enchant} {level}"
+  failed: "&cCould not apply enchantment."
+  conflicting: "&cThis enchantment conflicts with: {conflicting}"
+  max_level: "&cYou already have the maximum level of this enchantment."
+
+# Dungeon system
+dungeons:
+  enter: "&aEntering dungeon: &f{dungeon}"
+  exit: "&eYou exited the dungeon."
+  complete: "&aDungeon completed!\n&eRewards: &6{coins} coins, &b{exp} EXP"
+  wave: "&eWave {wave}/{max_waves}"
+  boss_spawn: "&cBOSS SPAWNED! &f{boss}"
+  insufficient_level: "&cMinimum level required: {level}"
+
+# Invasion system
+invasions:
+  start: "&cINVASION STARTED! &f{invasion}\n&eDuration: {duration} minutes"
+  end: "&aInvasion completed! Rewards: &6{coins} coins"
+  wave: "&cInvasion wave: {wave}/{max_waves}"
+  mob_killed: "&eYou killed an invader: &6+{coins} coins, &b+{exp} EXP"
+
+# Pet system
+pets:
+  spawn: "&aYou summoned your pet: &f{pet}"
+  despawn: "&eYou dismissed your pet."
+  level_up: "&aYour pet leveled up! &f{pet} &ais now level &6{level}&a."
+  feed: "&aYou fed &f{pet}&a."
+  hungry: "&eYour pet is hungry!"
+  list: "&e--- Your Pets ({count}) ---"
+
+# Squad system
+squads:
+  create: "&aYou created the squad: &f{squad}"
+  disband: "&cSquad disbanded: &f{squad}"
+  invite: "&aYou invited &f{player} &ato the squad."
+  invited: "&e{player} &finvited you to their squad. &a/squad accept {squad}"
+  join: "&aYou joined the squad: &f{squad}"
+  leave: "&eYou left the squad: &f{squad}"
+  kick: "&cYou kicked &f{player} &cfrom the squad."
+  kicked: "&cYou were kicked from the squad: &f{squad}"
+  promote: "&a{player} was promoted to &f{rank}&a."
+  list: "&e--- Squad {squad} ({members}/{max}) ---"
+  chat: "&b[S] &f{player}&7: {message}"
+  bank_deposit: "&aYou deposited &6{amount} coins &ato the squad bank."
+  bank_withdraw: "&aYou withdrew &6{amount} coins &afrom the squad bank."
+  bank_balance: "&eSquad bank: &6{balance} coins"
+  max_size: "&cThe squad is full. Maximum: {max}"
+
+# Achievement system
+achievements:
+  unlocked: "&aAchievement unlocked! &f{achievement}\n&e{description}\n&7Rewards: &6{coins} coins, &b{exp} EXP"
+  list: "&e--- Achievements ({unlocked}/{total}) ---"
+  progress: "&f{achievement}&7: &e{progress}%"
+
+# Bestiary system
+bestiary:
+  discovered: "&aNew bestiary entry! &f{mob}"
+  list: "&e--- Bestiary ({discovered}/{total}) ---"
+  info: "&e--- {mob} ---\n&fHealth: &c{health}\n&fDamage: &6{damage}\n&fDefense: &a{defense}\n&fTimes killed: &e{kills}"
+
+# Respawn system
+respawn:
+  set: "&aRespawn point set to: &f{zone}"
+  teleported: "&aTeleported to: &f{zone}"
+  zone_list: "&e--- Available Respawn Zones ---"
+
+# Admin commands
+admin:
+  give_coins: "&aYou gave &6{amount} coins &ato &f{player}&a."
+  set_level: "&aYou set &f{player}'s &alevel to &6{level}&a."
+  reload: "&aConfiguration reloaded."
+  clear_data: "&c{player}'s &cdata cleared."
