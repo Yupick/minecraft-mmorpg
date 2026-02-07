@@ -60,6 +60,11 @@ echo "[5/8] Copying configuration files..."
 mkdir -p "$INSTALL_DIR/config"
 cp -r "$SCRIPT_DIR/config/"* "$INSTALL_DIR/config/"
 
+# Create active world symlink if default world exists
+if [ -d "$INSTALL_DIR/worlds/mundo-inicial" ]; then
+    ln -sfn "$INSTALL_DIR/worlds/mundo-inicial" "$INSTALL_DIR/worlds/active"
+fi
+
 # Setup Python environment
 echo "[6/8] Setting up Python environment for web panel..."
 if [ ! -d "$INSTALL_DIR/web" ]; then

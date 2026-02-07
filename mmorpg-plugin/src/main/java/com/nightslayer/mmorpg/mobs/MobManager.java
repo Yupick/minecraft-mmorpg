@@ -28,12 +28,12 @@ public class MobManager {
     }
     
     private void loadCustomMobs() {
-        String sql = "SELECT * FROM custom_mobs WHERE active = 1";
+        String sql = "SELECT * FROM custom_mobs WHERE enabled = 1";
         try (ResultSet rs = db.executeQuery(sql)) {
             while (rs.next()) {
-                String id = rs.getString("mob_id");
-                String entityType = rs.getString("entity_type");
-                String displayName = rs.getString("display_name");
+            String id = rs.getString("id");
+            String entityType = rs.getString("type");
+            String displayName = rs.getString("name");
                 int level = rs.getInt("level");
                 double health = rs.getDouble("health");
                 double damage = rs.getDouble("damage");

@@ -71,7 +71,8 @@ public class MMORPGPlugin extends JavaPlugin {
         
         // Initialize database
         getLogger().info("Initializing database connection...");
-        databaseManager = DatabaseManager.getInstance();
+        String databasePath = getConfig().getString("database.path", "config/data/universal.db");
+        databaseManager = DatabaseManager.getInstance(this, databasePath);
         databaseManager.initializeConnection();
         
         // Run database migrations

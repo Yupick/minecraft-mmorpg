@@ -27,16 +27,16 @@ public class QuestManager {
     }
     
     private void loadQuests() {
-        String sql = "SELECT * FROM quests WHERE active = 1";
+        String sql = "SELECT * FROM quests WHERE enabled = 1";
         try (ResultSet rs = db.executeQuery(sql)) {
             while (rs.next()) {
-                int id = rs.getInt("id");
+                int id = parseQuestId(rs.getString("id"));
                 String name = rs.getString("name");
                 String description = rs.getString("description");
                 int minLevel = rs.getInt("min_level");
-                String type = rs.getString("type");
-                int coinReward = rs.getInt("coin_reward");
-                int expReward = rs.getInt("exp_reward");
+                String type = rs.getString("difficulty");
+                int coinReward = 0;
+                int expReward = 0;
                 
                 Quest quest = new Quest(id, name, description, minLevel, type, coinReward, expReward);
                 quests.put(id, quest);
@@ -131,5 +131,16 @@ public class QuestManager {
             plugin.getLogger().log(Level.SEVERE, "Error loading player level", e);
         }
         return 1;
+    }
+
+    private int parseQuestId(String idValue) {
+        if (idValue == null) {
+            return 0;
+        }
+        try {
+            return Integer.parseInt(idValue);
+        } catch (NumberFormatException ex) {
+            return 0;
+        }
     }
 }

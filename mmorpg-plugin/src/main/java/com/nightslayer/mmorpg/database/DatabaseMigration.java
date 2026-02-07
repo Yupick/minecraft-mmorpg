@@ -661,7 +661,8 @@ public class DatabaseMigration {
     public void migrateAllConfigs() {
         plugin.getLogger().info("Migrating configuration data...");
         
-        File configDir = new File(plugin.getDataFolder().getParent(), "config");
+        File serverRoot = plugin.getDataFolder().getParentFile().getParentFile();
+        File configDir = new File(serverRoot, "config");
         
         migrateCraftingRecipes(new File(configDir, "crafting_config.json"));
         migrateEnchantments(new File(configDir, "enchanting_config.json"));

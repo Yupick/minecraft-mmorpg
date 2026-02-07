@@ -112,11 +112,6 @@
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <relocations>
-                                <!-- Relocate SQLite -->
-                                <relocation>
-                                    <pattern>org.sqlite</pattern>
-                                    <shadedPattern>com.nightslayer.mmorpg.libs.sqlite</shadedPattern>
-                                </relocation>
                                 <!-- Relocate Gson -->
                                 <relocation>
                                     <pattern>com.google.gson</pattern>

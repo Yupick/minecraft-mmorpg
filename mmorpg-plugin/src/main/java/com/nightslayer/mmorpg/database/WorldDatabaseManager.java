@@ -41,7 +41,7 @@ public class WorldDatabaseManager {
     public boolean initializeWorldDatabase() {
         try {
             // Get the active world path through symlink
-            File serverDir = new File(plugin.getDataFolder().getParentFile().getParentFile(), "minecraft-server");
+            File serverDir = plugin.getDataFolder().getParentFile().getParentFile();
             File worldsDir = new File(serverDir, "worlds");
             File activeLink = new File(worldsDir, "active");
             
