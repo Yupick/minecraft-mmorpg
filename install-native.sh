@@ -66,6 +66,28 @@ mvn clean package -DskipTests
 mkdir -p "$INSTALL_DIR/plugins"
 cp target/mmorpg-plugin-*.jar "$INSTALL_DIR/plugins/"
 
+# Download compatibility plugins
+echo "[4.5/8] Downloading compatibility plugins..."
+echo "  • Geyser-Spigot (Bedrock Edition support)..."
+wget -q -O "$INSTALL_DIR/plugins/Geyser-Spigot.jar" "https://download.geysermc.org/v2/projects/geyser/versions/latest/builds/latest/downloads/spigot" 2>/dev/null || \
+    echo "    WARNING: Could not download Geyser-Spigot"
+
+echo "  • Floodgate-Spigot (Bedrock authentication)..."
+wget -q -O "$INSTALL_DIR/plugins/floodgate-spigot.jar" "https://download.geysermc.org/v2/projects/floodgate/versions/latest/builds/latest/downloads/spigot" 2>/dev/null || \
+    echo "    WARNING: Could not download Floodgate-Spigot"
+
+echo "  • ViaVersion (Support for older versions)..."
+wget -q -O "$INSTALL_DIR/plugins/ViaVersion.jar" "https://download.viaversion.com/ViaVersion.jar" 2>/dev/null || \
+    echo "    WARNING: Could not download ViaVersion"
+
+echo "  • ViaBackwards (Support for older versions)..."
+wget -q -O "$INSTALL_DIR/plugins/ViaBackwards.jar" "https://download.viaversion.com/ViaBackwards.jar" 2>/dev/null || \
+    echo "    WARNING: Could not download ViaBackwards"
+
+echo "  • ViaRewind (Support for very old versions)..."
+wget -q -O "$INSTALL_DIR/plugins/ViaRewind.jar" "https://download.viaversion.com/ViaRewind.jar" 2>/dev/null || \
+    echo "    WARNING: Could not download ViaRewind"
+
 # Copy configs
 echo "[5/8] Copying configuration files..."
 mkdir -p "$INSTALL_DIR/config"
