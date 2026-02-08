@@ -67,7 +67,8 @@ if ! validate_jar "Geyser-Spigot.jar" 2>/dev/null; then
     echo -e "${YELLOW}⚠ Geyser-Spigot.jar está corrupto o no existe${NC}"
     download_plugin "Geyser-Spigot" "$PLUGINS_DIR/Geyser-Spigot.jar" \
         "https://download.geysermc.org/v2/projects/geyser/versions/latest/builds/latest/downloads/spigot" \
-        "https://ci.opencollab.dev/job/GeyserMC/job/Geyser/job/master/lastSuccessfulBuild/artifact/bootstrap/spigot/build/libs/Geyser-Spigot.jar" || \
+        "https://ci.opencollab.dev/job/GeyserMC/job/Geyser/job/master/lastSuccessfulBuild/artifact/bootstrap/spigot/build/libs/Geyser-Spigot.jar" \
+        "https://github.com/GeyserMC/Geyser/releases/latest/download/Geyser-Spigot.jar" || \
         ((plugins_failed++))
 fi
 
@@ -76,7 +77,8 @@ if ! validate_jar "floodgate-spigot.jar" 2>/dev/null; then
     echo -e "${YELLOW}⚠ floodgate-spigot.jar está corrupto o no existe${NC}"
     download_plugin "Floodgate-Spigot" "$PLUGINS_DIR/floodgate-spigot.jar" \
         "https://download.geysermc.org/v2/projects/floodgate/versions/latest/builds/latest/downloads/spigot" \
-        "https://ci.opencollab.dev/job/GeyserMC/job/Floodgate/job/master/lastSuccessfulBuild/artifact/spigot/build/libs/floodgate-spigot.jar" || \
+        "https://ci.opencollab.dev/job/GeyserMC/job/Floodgate/job/master/lastSuccessfulBuild/artifact/spigot/build/libs/floodgate-spigot.jar" \
+        "https://github.com/GeyserMC/Floodgate/releases/latest/download/floodgate-spigot.jar" || \
         ((plugins_failed++))
 fi
 
@@ -84,7 +86,6 @@ fi
 if ! validate_jar "ViaVersion.jar" 2>/dev/null; then
     echo -e "${YELLOW}⚠ ViaVersion.jar está corrupto o no existe${NC}"
     download_plugin "ViaVersion" "$PLUGINS_DIR/ViaVersion.jar" \
-        "https://download.viaversion.com/ViaVersion.jar" \
         "https://hangar.papermc.io/api/v1/projects/ViaVersion/versions/LATEST/downloads/ViaVersion.jar" || \
         ((plugins_failed++))
 fi
@@ -93,7 +94,6 @@ fi
 if ! validate_jar "ViaBackwards.jar" 2>/dev/null; then
     echo -e "${YELLOW}⚠ ViaBackwards.jar está corrupto o no existe${NC}"
     download_plugin "ViaBackwards" "$PLUGINS_DIR/ViaBackwards.jar" \
-        "https://download.viaversion.com/ViaBackwards.jar" \
         "https://hangar.papermc.io/api/v1/projects/ViaBackwards/versions/LATEST/downloads/ViaBackwards.jar" || \
         ((plugins_failed++))
 fi
@@ -102,7 +102,6 @@ fi
 if ! validate_jar "ViaRewind.jar" 2>/dev/null; then
     echo -e "${YELLOW}⚠ ViaRewind.jar está corrupto o no existe${NC}"
     download_plugin "ViaRewind" "$PLUGINS_DIR/ViaRewind.jar" \
-        "https://download.viaversion.com/ViaRewind.jar" \
         "https://hangar.papermc.io/api/v1/projects/ViaRewind/versions/LATEST/downloads/ViaRewind.jar" || \
         ((plugins_failed++))
 fi
