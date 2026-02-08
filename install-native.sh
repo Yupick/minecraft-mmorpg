@@ -17,6 +17,17 @@ echo "  Minecraft MMORPG System - Installer"
 echo "  Version: 1.0.0"
 echo "═══════════════════════════════════════════════════════════════"
 
+confirm() {
+    while true; do
+        read -r -p "$1 (y/n): " yn
+        case $yn in
+            [Yy]* ) return 0;;
+            [Nn]* ) return 1;;
+            * ) echo "Please answer y or n.";;
+        esac
+    done
+}
+
 # Check Java
 echo "[1/8] Checking Java $JAVA_VERSION..."
 if ! command -v java &> /dev/null || ! java -version 2>&1 | grep -q "version \"$JAVA_VERSION"; then
@@ -75,9 +86,130 @@ python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 
-# Create systemd services
-echo "[7/8] Creating systemd services..."
-sudo tee /etc/systemd/system/mmorpg-server.service > /dev/null <<EOF
+# Create management scripts in server root
+echo "[7/8] Creating management scripts..."
+cat > "$INSTALL_DIR/start-server.sh" <<'EOF'
+#!/bin/bash
+set -e
+if systemctl --version &> /dev/null && systemctl list-unit-files | grep -q "mmorpg-server.service"; then
+    sudo systemctl start mmorpg-server.service
+else
+    cd "$(dirname "$0")"
+    exec /usr/bin/java -Xms4G -Xmx4G -jar paper-1.20.6-151.jar nogui
+fi
+EOF
+
+cat > "$INSTALL_DIR/stop-server.sh" <<'EOF'
+#!/bin/bash
+set -e
+if systemctl --version &> /dev/null && systemctl list-unit-files | grep -q "mmorpg-server.service"; then
+    sudo systemctl stop mmorpg-server.service
+else
+    pkill -f "paper.*jar" || true
+fi
+EOF
+
+cat > "$INSTALL_DIR/restart-server.sh" <<'EOF'
+#!/bin/bash
+set -e
+if systemctl --version &> /dev/null && systemctl list-unit-files | grep -q "mmorpg-server.service"; then
+    sudo systemctl restart mmorpg-server.service
+else
+    pkill -f "paper.*jar" || true
+    cd "$(dirname "$0")"
+    exec /usr/bin/java -Xms4G -Xmx4G -jar paper-1.20.6-151.jar nogui
+fi
+EOF
+
+cat > "$INSTALL_DIR/logs-server.sh" <<'EOF'
+#!/bin/bash
+set -e
+if systemctl --version &> /dev/null && systemctl list-unit-files | grep -q "mmorpg-server.service"; then
+    journalctl -u mmorpg-server.service -f --no-pager
+else
+    tail -f "$(dirname "$0")/logs/latest.log"
+fi
+EOF
+
+cat > "$INSTALL_DIR/status-server.sh" <<'EOF'
+#!/bin/bash
+set -e
+if systemctl --version &> /dev/null && systemctl list-unit-files | grep -q "mmorpg-server.service"; then
+    systemctl status mmorpg-server.service --no-pager
+else
+    pgrep -f "paper.*jar" >/dev/null && echo "Server: running" || echo "Server: stopped"
+fi
+EOF
+
+cat > "$INSTALL_DIR/start-web.sh" <<'EOF'
+#!/bin/bash
+set -e
+if systemctl --version &> /dev/null && systemctl list-unit-files | grep -q "mmorpg-web.service"; then
+    sudo systemctl start mmorpg-web.service
+else
+    cd "$(dirname "$0")/web"
+    exec ./start-web.sh
+fi
+EOF
+
+cat > "$INSTALL_DIR/stop-web.sh" <<'EOF'
+#!/bin/bash
+set -e
+if systemctl --version &> /dev/null && systemctl list-unit-files | grep -q "mmorpg-web.service"; then
+    sudo systemctl stop mmorpg-web.service
+else
+    pkill -f "flask.*app.py" || true
+fi
+EOF
+
+cat > "$INSTALL_DIR/restart-web.sh" <<'EOF'
+#!/bin/bash
+set -e
+if systemctl --version &> /dev/null && systemctl list-unit-files | grep -q "mmorpg-web.service"; then
+    sudo systemctl restart mmorpg-web.service
+else
+    pkill -f "flask.*app.py" || true
+    cd "$(dirname "$0")/web"
+    exec ./start-web.sh
+fi
+EOF
+
+cat > "$INSTALL_DIR/logs-web.sh" <<'EOF'
+#!/bin/bash
+set -e
+if systemctl --version &> /dev/null && systemctl list-unit-files | grep -q "mmorpg-web.service"; then
+    journalctl -u mmorpg-web.service -f --no-pager
+else
+    tail -f "$(dirname "$0")/web/panel.log"
+fi
+EOF
+
+cat > "$INSTALL_DIR/status-web.sh" <<'EOF'
+#!/bin/bash
+set -e
+if systemctl --version &> /dev/null && systemctl list-unit-files | grep -q "mmorpg-web.service"; then
+    systemctl status mmorpg-web.service --no-pager
+else
+    pgrep -f "flask.*app.py" >/dev/null && echo "Web: running" || echo "Web: stopped"
+fi
+EOF
+
+chmod +x \
+    "$INSTALL_DIR"/start-server.sh \
+    "$INSTALL_DIR"/stop-server.sh \
+    "$INSTALL_DIR"/restart-server.sh \
+    "$INSTALL_DIR"/logs-server.sh \
+    "$INSTALL_DIR"/status-server.sh \
+    "$INSTALL_DIR"/start-web.sh \
+    "$INSTALL_DIR"/stop-web.sh \
+    "$INSTALL_DIR"/restart-web.sh \
+    "$INSTALL_DIR"/logs-web.sh \
+    "$INSTALL_DIR"/status-web.sh
+
+# Create systemd services (optional)
+echo "[8/8] System services (optional)..."
+if confirm "Install Minecraft server as a system service?"; then
+    sudo tee /etc/systemd/system/mmorpg-server.service > /dev/null <<EOF
 [Unit]
 Description=Minecraft MMORPG Server
 After=network.target
@@ -92,8 +224,13 @@ Restart=always
 [Install]
 WantedBy=multi-user.target
 EOF
+    sudo systemctl daemon-reload
+    sudo systemctl start mmorpg-server
+    sudo systemctl enable mmorpg-server
+fi
 
-sudo tee /etc/systemd/system/mmorpg-web.service > /dev/null <<EOF
+if confirm "Install web panel as a system service?"; then
+    sudo tee /etc/systemd/system/mmorpg-web.service > /dev/null <<EOF
 [Unit]
 Description=MMORPG Web Panel
 After=network.target
@@ -108,14 +245,10 @@ Restart=always
 [Install]
 WantedBy=multi-user.target
 EOF
-
-sudo systemctl daemon-reload
-
-echo "[8/8] Starting services..."
-sudo systemctl start mmorpg-server
-sudo systemctl enable mmorpg-server
-sudo systemctl start mmorpg-web
-sudo systemctl enable mmorpg-web
+    sudo systemctl daemon-reload
+    sudo systemctl start mmorpg-web
+    sudo systemctl enable mmorpg-web
+fi
 
 echo "═══════════════════════════════════════════════════════════════"
 echo "  Installation Complete!"
