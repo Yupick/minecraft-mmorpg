@@ -68,25 +68,80 @@ cp target/mmorpg-plugin-*.jar "$INSTALL_DIR/plugins/"
 
 # Download compatibility plugins
 echo "[4.5/8] Downloading compatibility plugins..."
+
+# Helper function to validate JAR file
+validate_jar() {
+    if [ -f "$1" ] && [ -s "$1" ]; then
+        file "$1" | grep -q "Zip data" && return 0
+        rm -f "$1"
+    fi
+    return 1
+}
+
+# Geyser-Spigot (Bedrock Edition support)
 echo "  • Geyser-Spigot (Bedrock Edition support)..."
-wget -q -O "$INSTALL_DIR/plugins/Geyser-Spigot.jar" "https://download.geysermc.org/v2/projects/geyser/versions/latest/builds/latest/downloads/spigot" 2>/dev/null || \
-    echo "    WARNING: Could not download Geyser-Spigot"
+if ! wget -q -O "$INSTALL_DIR/plugins/Geyser-Spigot.jar" \
+    "https://download.geysermc.org/v2/projects/geyser/versions/latest/builds/latest/downloads/spigot" 2>/dev/null || \
+    ! validate_jar "$INSTALL_DIR/plugins/Geyser-Spigot.jar"; then
+    echo "    ⚠ Could not download from primary source, trying alternative..."
+    wget -q -O "$INSTALL_DIR/plugins/Geyser-Spigot.jar" \
+        "https://ci.opencollab.dev/job/GeyserMC/job/Geyser/job/master/lastSuccessfulBuild/artifact/bootstrap/spigot/build/libs/Geyser-Spigot.jar" 2>/dev/null || \
+        echo "    ✗ FAILED: Geyser-Spigot (optional)"
+fi
 
+# Floodgate-Spigot (Bedrock authentication)
 echo "  • Floodgate-Spigot (Bedrock authentication)..."
-wget -q -O "$INSTALL_DIR/plugins/floodgate-spigot.jar" "https://download.geysermc.org/v2/projects/floodgate/versions/latest/builds/latest/downloads/spigot" 2>/dev/null || \
-    echo "    WARNING: Could not download Floodgate-Spigot"
+if ! wget -q -O "$INSTALL_DIR/plugins/floodgate-spigot.jar" \
+    "https://download.geysermc.org/v2/projects/floodgate/versions/latest/builds/latest/downloads/spigot" 2>/dev/null || \
+    ! validate_jar "$INSTALL_DIR/plugins/floodgate-spigot.jar"; then
+    echo "    ⚠ Could not download from primary source, trying alternative..."
+    wget -q -O "$INSTALL_DIR/plugins/floodgate-spigot.jar" \
+        "https://ci.opencollab.dev/job/GeyserMC/job/Floodgate/job/master/lastSuccessfulBuild/artifact/spigot/build/libs/floodgate-spigot.jar" 2>/dev/null || \
+        echo "    ✗ FAILED: Floodgate-Spigot (optional)"
+fi
 
-echo "  • ViaVersion (Support for older versions)..."
-wget -q -O "$INSTALL_DIR/plugins/ViaVersion.jar" "https://download.viaversion.com/ViaVersion.jar" 2>/dev/null || \
-    echo "    WARNING: Could not download ViaVersion"
+# ViaVersion (Support for older Java Edition versions)
+echo "  • ViaVersion (Java Edition version compatibility)..."
+if ! wget -q -O "$INSTALL_DIR/plugins/ViaVersion.jar" \
+    "https://download.viaversion.com/ViaVersion.jar" 2>/dev/null || \
+    ! validate_jar "$INSTALL_DIR/plugins/ViaVersion.jar"; then
+    echo "    ⚠ Could not download from primary source, trying Hangar..."
+    wget -q -O "$INSTALL_DIR/plugins/ViaVersion.jar" \
+        "https://hangar.papermc.io/api/v1/projects/ViaVersion/versions/LATEST/downloads/ViaVersion.jar" 2>/dev/null || \
+        echo "    ✗ FAILED: ViaVersion (optional)"
+fi
 
-echo "  • ViaBackwards (Support for older versions)..."
-wget -q -O "$INSTALL_DIR/plugins/ViaBackwards.jar" "https://download.viaversion.com/ViaBackwards.jar" 2>/dev/null || \
-    echo "    WARNING: Could not download ViaBackwards"
+# ViaBackwards (Support for older versions compatibility)
+echo "  • ViaBackwards (Older version support)..."
+if ! wget -q -O "$INSTALL_DIR/plugins/ViaBackwards.jar" \
+    "https://download.viaversion.com/ViaBackwards.jar" 2>/dev/null || \
+    ! validate_jar "$INSTALL_DIR/plugins/ViaBackwards.jar"; then
+    echo "    ⚠ Could not download from primary source, trying Hangar..."
+    wget -q -O "$INSTALL_DIR/plugins/ViaBackwards.jar" \
+        "https://hangar.papermc.io/api/v1/projects/ViaBackwards/versions/LATEST/downloads/ViaBackwards.jar" 2>/dev/null || \
+        echo "    ✗ FAILED: ViaBackwards (optional)"
+fi
 
-echo "  • ViaRewind (Support for very old versions)..."
-wget -q -O "$INSTALL_DIR/plugins/ViaRewind.jar" "https://download.viaversion.com/ViaRewind.jar" 2>/dev/null || \
-    echo "    WARNING: Could not download ViaRewind"
+# ViaRewind (Support for very old versions)
+echo "  • ViaRewind (Very old version support)..."
+if ! wget -q -O "$INSTALL_DIR/plugins/ViaRewind.jar" \
+    "https://download.viaversion.com/ViaRewind.jar" 2>/dev/null || \
+    ! validate_jar "$INSTALL_DIR/plugins/ViaRewind.jar"; then
+    echo "    ⚠ Could not download from primary source, trying Hangar..."
+    wget -q -O "$INSTALL_DIR/plugins/ViaRewind.jar" \
+        "https://hangar.papermc.io/api/v1/projects/ViaRewind/versions/LATEST/downloads/ViaRewind.jar" 2>/dev/null || \
+        echo "    ✗ FAILED: ViaRewind (optional)"
+fi
+
+# List downloaded plugins
+echo ""
+echo "  Downloaded plugins:"
+ls -1 "$INSTALL_DIR/plugins/"*.jar 2>/dev/null | while read jar; do
+    size=$(du -h "$jar" | cut -f1)
+    name=$(basename "$jar")
+    printf "    ✓ %-30s %s\n" "$name" "$size"
+done
+echo ""
 
 # Copy configs
 echo "[5/8] Copying configuration files..."
