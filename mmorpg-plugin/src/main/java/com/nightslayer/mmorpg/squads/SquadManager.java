@@ -6,11 +6,9 @@ import com.nightslayer.mmorpg.database.DatabaseManager;
 import java.util.UUID;
 
 public class SquadManager {
-    private final MMORPGPlugin plugin;
     private final DatabaseManager db;
     
     public SquadManager(MMORPGPlugin plugin) {
-        this.plugin = plugin;
         this.db = plugin.getDatabaseManager();
     }
     

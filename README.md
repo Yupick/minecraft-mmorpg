@@ -13,6 +13,7 @@ Sistema completo de servidor MMORPG para Minecraft Paper 1.20.6 con plugin Java 
 - [Características](#-características)
 - [Requisitos](#-requisitos)
 - [Instalación](#-instalación)
+- [Actualización](#-actualización)
 - [Estructura del Proyecto](#-estructura-del-proyecto)
 - [Uso](#-uso)
 - [Configuración](#-configuración)
@@ -208,6 +209,29 @@ minecraft-mmorpg/
     ├── PLUGIN_DEV.md           # Guía de desarrollo del plugin
     └── WEB_PANEL.md            # Guía del panel web
 ```
+
+## 🚄 Actualización
+
+### Actualizar desde GitHub
+
+Ejecuta el script de actualización automática desde el servidor:
+
+```bash
+# Actualización automática (interactiva)
+./update.sh
+
+# El script:
+# ✅ Descarga cambios de GitHub
+# ✅ Verifica cambios locales
+# ✅ Crea backup automático
+# ✅ Detiene servicios
+# ✅ Recompila plugin si es necesario
+# ✅ Instala cambios
+# ✅ Reinicia servicios
+# ✅ Muestra resumen
+```
+
+Para más información, ver [UPDATE_GUIDE.md](UPDATE_GUIDE.md)
 
 ## 🎮 Uso
 

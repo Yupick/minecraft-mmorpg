@@ -2,6 +2,7 @@ package com.nightslayer.mmorpg.mobs;
 
 import com.nightslayer.mmorpg.MMORPGPlugin;
 import com.nightslayer.mmorpg.database.DatabaseManager;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.EntityType;
@@ -19,6 +20,7 @@ public class MobManager {
     private final MMORPGPlugin plugin;
     private final DatabaseManager db;
     private final Map<String, CustomMob> customMobs;
+    private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacySection();
     
     public MobManager(MMORPGPlugin plugin) {
         this.plugin = plugin;
@@ -31,9 +33,9 @@ public class MobManager {
         String sql = "SELECT * FROM custom_mobs WHERE enabled = 1";
         try (ResultSet rs = db.executeQuery(sql)) {
             while (rs.next()) {
-            String id = rs.getString("id");
-            String entityType = rs.getString("type");
-            String displayName = rs.getString("name");
+                String id = rs.getString("id");
+                String entityType = rs.getString("type");
+                String displayName = rs.getString("name");
                 int level = rs.getInt("level");
                 double health = rs.getDouble("health");
                 double damage = rs.getDouble("damage");
@@ -50,7 +52,7 @@ public class MobManager {
     public void applyCustomMob(LivingEntity entity, String mobId) {
         CustomMob mob = customMobs.get(mobId);
         if (mob != null) {
-            entity.setCustomName(mob.displayName);
+            entity.customName(LEGACY.deserialize(mob.displayName));
             entity.setCustomNameVisible(true);
             entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(mob.health);
             entity.setHealth(mob.health);

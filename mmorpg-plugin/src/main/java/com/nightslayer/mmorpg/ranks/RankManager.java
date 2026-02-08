@@ -2,6 +2,7 @@ package com.nightslayer.mmorpg.ranks;
 
 import com.nightslayer.mmorpg.database.DatabaseManager;
 import com.nightslayer.mmorpg.i18n.LanguageManager;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -25,6 +26,7 @@ public class RankManager {
     private final DatabaseManager dbManager;
     private final LanguageManager langManager;
     private final List<Rank> ranks;
+    private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacySection();
     
     public RankManager(DatabaseManager dbManager, LanguageManager langManager) {
         this.dbManager = dbManager;
@@ -147,8 +149,8 @@ public class RankManager {
             stmt.executeUpdate();
             
             // Announce ascension
-            Bukkit.broadcastMessage(langManager.getMessage("rank.ascended",
-                player.getName(), nextRank.getColorCode() + nextRank.getName()));
+            Bukkit.broadcast(LEGACY.deserialize(langManager.getMessage("rank.ascended",
+                player.getName(), nextRank.getColorCode() + nextRank.getName())));
             
             player.sendMessage(langManager.getMessage("rank.benefits",
                 (int)((nextRank.getDamageMultiplier() - 1) * 100),

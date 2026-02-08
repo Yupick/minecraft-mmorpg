@@ -57,7 +57,7 @@ public class MMORPGPlugin extends JavaPlugin {
         
         getLogger().info("═══════════════════════════════════════");
         getLogger().info("  Minecraft MMORPG System");
-        getLogger().info("  Version: " + getDescription().getVersion());
+        getLogger().info("  Version: " + getPluginMeta().getVersion());
         getLogger().info("  Author: NightSlayer");
         getLogger().info("═══════════════════════════════════════");
         
@@ -216,20 +216,6 @@ public class MMORPGPlugin extends JavaPlugin {
         // getCommand("bestiary").setExecutor(new BestiaryCommand(this));
         // getCommand("achievements").setExecutor(new AchievementsCommand(this));
         // getCommand("mmorpgadmin").setExecutor(new AdminCommand(this));
-    }
-    
-    /**
-     * Start scheduled tasks.
-     * TODO: Implement in Phase 4
-     */
-    private void startTasks() {
-        getLogger().info("Starting scheduled tasks...");
-        
-        // TODO: Auto-save task every 5 minutes
-        // TODO: Spawn manager tick task
-        // TODO: Invasion check task
-        // TODO: Dungeon manager task
-        // TODO: Pet AI task
     }
     
     // Getters for managers

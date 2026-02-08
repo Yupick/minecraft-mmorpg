@@ -8,11 +8,9 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 public class PlayerListener implements Listener {
-    private final MMORPGPlugin plugin;
     private final DatabaseManager db;
     
     public PlayerListener(MMORPGPlugin plugin) {
-        this.plugin = plugin;
         this.db = plugin.getDatabaseManager();
     }
     

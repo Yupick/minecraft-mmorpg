@@ -7,11 +7,9 @@ import java.sql.ResultSet;
 import java.util.UUID;
 
 public class EconomyManager {
-    private final MMORPGPlugin plugin;
     private final DatabaseManager db;
     
     public EconomyManager(MMORPGPlugin plugin) {
-        this.plugin = plugin;
         this.db = plugin.getDatabaseManager();
     }
     

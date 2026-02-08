@@ -25,12 +25,9 @@ import java.util.stream.Collectors;
  * Usage: /quest <list|start|progress|abandon|info>
  */
 public class QuestCommand implements CommandExecutor, TabCompleter {
-    
-    private final MMORPGPlugin plugin;
     private final QuestManager questManager;
     
     public QuestCommand(MMORPGPlugin plugin) {
-        this.plugin = plugin;
         this.questManager = plugin.getQuestManager();
     }
     

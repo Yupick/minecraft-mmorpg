@@ -88,7 +88,7 @@ public class SpawnListener implements Listener {
         }
         
         // Handle natural spawns vs custom spawns
-        if (reason == SpawnReason.NATURAL || reason == SpawnReason.CHUNK_GEN) {
+        if (reason == SpawnReason.NATURAL || reason == SpawnReason.DEFAULT) {
             handleNaturalSpawn(event, entity, location);
         } else if (reason == SpawnReason.CUSTOM || reason == SpawnReason.SPAWNER_EGG) {
             handleCustomSpawn(event, entity, location);

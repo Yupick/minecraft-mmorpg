@@ -185,14 +185,17 @@ public class PetManager {
         );
         
         // Configure entity
-        entity.setCustomName("§e" + petDef.getName() + " §7(Lv." + petLevel + ")");
+        entity.customName(net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
+            .legacySection().deserialize("§e" + petDef.getName() + " §7(Lv." + petLevel + ")"));
         entity.setCustomNameVisible(true);
         entity.setRemoveWhenFarAway(false);
         
         // Apply stats based on level
         double health = petDef.getBaseHealth() * (1 + petLevel * 0.1);
-        entity.setMaxHealth(health);
-        entity.setHealth(health);
+        if (entity.getAttribute(org.bukkit.attribute.Attribute.GENERIC_MAX_HEALTH) != null) {
+            entity.getAttribute(org.bukkit.attribute.Attribute.GENERIC_MAX_HEALTH).setBaseValue(health);
+            entity.setHealth(health);
+        }
         
         // Make tameable if applicable
         if (entity instanceof Tameable tameable) {

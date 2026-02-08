@@ -2,6 +2,7 @@ package com.nightslayer.mmorpg.achievements;
 
 import com.nightslayer.mmorpg.database.DatabaseManager;
 import com.nightslayer.mmorpg.i18n.LanguageManager;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -25,6 +26,7 @@ public class AchievementManager {
     private final DatabaseManager dbManager;
     private final LanguageManager langManager;
     private final Map<String, Achievement> achievements;
+    private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacySection();
     
     public AchievementManager(DatabaseManager dbManager, LanguageManager langManager) {
         this.dbManager = dbManager;
@@ -148,8 +150,8 @@ public class AchievementManager {
             giveRewards(player, achievement);
             
             // Announce
-            Bukkit.broadcastMessage(langManager.getMessage("achievement.unlocked",
-                player.getName(), achievement.getName()));
+            Bukkit.broadcast(LEGACY.deserialize(langManager.getMessage("achievement.unlocked",
+                player.getName(), achievement.getName())));
             
             player.sendMessage(langManager.getMessage("achievement.reward",
                 achievement.getCoinReward(), achievement.getExpReward()));

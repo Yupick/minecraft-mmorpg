@@ -3,7 +3,6 @@ package com.nightslayer.mmorpg.quests;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 
-import java.util.*;
 
 /**
  * Represents a quest objective that must be completed

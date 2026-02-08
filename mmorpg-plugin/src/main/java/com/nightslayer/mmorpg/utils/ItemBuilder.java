@@ -1,6 +1,8 @@
 package com.nightslayer.mmorpg.utils;
 
 import com.nightslayer.mmorpg.MMORPGPlugin;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
@@ -17,6 +19,7 @@ public class ItemBuilder {
     
     private final ItemStack item;
     private final MMORPGPlugin plugin;
+    private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacySection();
     
     public ItemBuilder(ItemStack item, MMORPGPlugin plugin) {
         this.item = item;
@@ -29,7 +32,7 @@ public class ItemBuilder {
     public ItemBuilder setDisplayName(String name) {
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(name.replace('&', '§'));
+            meta.displayName(LEGACY.deserialize(name.replace('&', '§')));
             item.setItemMeta(meta);
         }
         return this;
@@ -41,11 +44,11 @@ public class ItemBuilder {
     public ItemBuilder setLore(List<String> lore) {
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            List<String> coloredLore = new ArrayList<>();
+            List<Component> coloredLore = new ArrayList<>();
             for (String line : lore) {
-                coloredLore.add(line.replace('&', '§'));
+                coloredLore.add(LEGACY.deserialize(line.replace('&', '§')));
             }
-            meta.setLore(coloredLore);
+            meta.lore(coloredLore);
             item.setItemMeta(meta);
         }
         return this;
@@ -57,12 +60,12 @@ public class ItemBuilder {
     public ItemBuilder addLoreLine(String line) {
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            List<String> lore = meta.getLore();
+            List<Component> lore = meta.lore();
             if (lore == null) {
                 lore = new ArrayList<>();
             }
-            lore.add(line.replace('&', '§'));
-            meta.setLore(lore);
+            lore.add(LEGACY.deserialize(line.replace('&', '§')));
+            meta.lore(lore);
             item.setItemMeta(meta);
         }
         return this;

@@ -1,6 +1,7 @@
 package com.nightslayer.mmorpg.invasions;
 
 import com.nightslayer.mmorpg.database.DatabaseManager;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -30,6 +31,7 @@ public class InvasionManager {
     private final Map<String, Invasion> invasions;
     private ActiveInvasion currentInvasion;
     private final Set<UUID> participants;
+    private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacySection();
     
     public InvasionManager(DatabaseManager dbManager) {
         this.dbManager = dbManager;
@@ -106,8 +108,8 @@ public class InvasionManager {
         participants.clear();
         
         // Announce invasion
-        Bukkit.broadcastMessage("§c§l[INVASIÓN] §f" + invasion.getName() + " ha comenzado!");
-        Bukkit.broadcastMessage("§7Defiende el servidor y gana recompensas!");
+        Bukkit.broadcast(LEGACY.deserialize("§c§l[INVASIÓN] §f" + invasion.getName() + " ha comenzado!"));
+        Bukkit.broadcast(LEGACY.deserialize("§7Defiende el servidor y gana recompensas!"));
         
         // Start first wave
         currentInvasion.startNextWave();
@@ -122,7 +124,7 @@ public class InvasionManager {
         if (currentInvasion == null) return;
         
         if (success) {
-            Bukkit.broadcastMessage("§a§l[INVASIÓN] §f¡Invasión repelida con éxito!");
+            Bukkit.broadcast(LEGACY.deserialize("§a§l[INVASIÓN] §f¡Invasión repelida con éxito!"));
             
             // Distribute participation rewards
             for (UUID uuid : participants) {
@@ -135,7 +137,7 @@ public class InvasionManager {
                 }
             }
         } else {
-            Bukkit.broadcastMessage("§c§l[INVASIÓN] §fLa invasión ha sido demasiado fuerte...");
+            Bukkit.broadcast(LEGACY.deserialize("§c§l[INVASIÓN] §fLa invasión ha sido demasiado fuerte..."));
         }
         
         currentInvasion = null;
@@ -273,7 +275,7 @@ public class InvasionManager {
             }
             
             // Announce wave
-            Bukkit.broadcastMessage("§e§l[INVASIÓN] §fOleada " + currentWave + "/" + invasion.getWaves());
+            Bukkit.broadcast(LEGACY.deserialize("§e§l[INVASIÓN] §fOleada " + currentWave + "/" + invasion.getWaves()));
             
             // Spawn mobs
             spawnWaveMobs();
@@ -304,7 +306,7 @@ public class InvasionManager {
                 LivingEntity entity = (LivingEntity) center.getWorld().spawnEntity(spawnLoc, type);
                 
                 // Mark as invasion mob
-                entity.setCustomName("§c[INVASIÓN] " + entity.getType().name());
+                entity.customName(LEGACY.deserialize("§c[INVASIÓN] " + entity.getType().name()));
                 entity.setCustomNameVisible(true);
                 
                 spawnedMobs.add(entity.getUniqueId());

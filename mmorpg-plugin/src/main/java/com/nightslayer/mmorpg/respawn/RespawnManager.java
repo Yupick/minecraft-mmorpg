@@ -4,6 +4,7 @@ import com.nightslayer.mmorpg.database.DatabaseManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -111,7 +112,9 @@ public class RespawnManager {
             }
             
             // Restore health and hunger
-            player.setHealth(player.getMaxHealth());
+            if (player.getAttribute(Attribute.GENERIC_MAX_HEALTH) != null) {
+                player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+            }
             player.setFoodLevel(20);
             player.setFireTicks(0);
         }

@@ -380,9 +380,14 @@ public class DungeonManager {
             LivingEntity boss = (LivingEntity) spawnLoc.getWorld().spawnEntity(spawnLoc, bossType);
             
             // Apply boss multipliers
-            boss.setMaxHealth(boss.getMaxHealth() * dungeon.getBossHealthMultiplier());
-            boss.setHealth(boss.getMaxHealth());
-            boss.setCustomName("§c§l" + dungeon.getName() + " Boss");
+            if (boss.getAttribute(org.bukkit.attribute.Attribute.GENERIC_MAX_HEALTH) != null) {
+                double newMax = boss.getAttribute(org.bukkit.attribute.Attribute.GENERIC_MAX_HEALTH)
+                    .getBaseValue() * dungeon.getBossHealthMultiplier();
+                boss.getAttribute(org.bukkit.attribute.Attribute.GENERIC_MAX_HEALTH).setBaseValue(newMax);
+                boss.setHealth(newMax);
+            }
+            boss.customName(net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
+                .legacySection().deserialize("§c§l" + dungeon.getName() + " Boss"));
             boss.setCustomNameVisible(true);
             
             aliveMonsters.add(boss.getUniqueId());
