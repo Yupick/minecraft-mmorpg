@@ -34,9 +34,9 @@ download_file() {
     local url="$1"
     local output="$2"
     if command -v curl &> /dev/null; then
-        curl -fSL -o "$output" "$url" 2>/dev/null
+        curl -fSL -o "$output" "$url"
     elif command -v wget &> /dev/null; then
-        wget -qO "$output" "$url" 2>/dev/null
+        wget -qO "$output" "$url"
     else
         echo "ERROR: Neither curl nor wget found"
         return 1
@@ -54,12 +54,19 @@ download_from_hangar() {
         python3 -c "import json,sys; data=json.load(sys.stdin); dl=data['result'][0]['downloads']['${platform}'] if data.get('result') and len(data['result']) > 0 else {}; print(dl.get('downloadUrl') or dl.get('externalUrl') or '')" 2>/dev/null)
     
     if [ -z "$download_info" ]; then
-        echo "    ✗ Could not fetch download URL for $project_slug"
         return 1
     fi
     
-    # Download
-    download_file "$download_info" "$output"
+    # Download (suppress curl progress but show errors)
+    download_file "$download_info" "$output" 2>&1 | grep -v "Total\|Dload\|%" || true
+    
+    # Validate downloaded file
+    if [ -f "$output" ] && [ -s "$output" ]; then
+        return 0
+    else
+        rm -f "$output" 2>/dev/null
+        return 1
+    fi
 }
 
 # Select Paper version interactively
@@ -146,7 +153,7 @@ echo "[4.5/8] Downloading compatibility plugins..."
 # Helper function to validate JAR file
 validate_jar() {
     if [ -f "$1" ] && [ -s "$1" ]; then
-        file "$1" | grep -q "Zip data" && return 0
+        file "$1" | grep -q "Java\|Zip" && return 0
         rm -f "$1"
     fi
     return 1
@@ -154,45 +161,52 @@ validate_jar() {
 
 # Geyser-Spigot (Bedrock Edition support)
 echo "  • Geyser-Spigot (Bedrock Edition support)..."
-if ! download_from_hangar "GeyserMC/Geyser" "$INSTALL_DIR/plugins/Geyser-Spigot.jar" "PAPER" || \
-    ! validate_jar "$INSTALL_DIR/plugins/Geyser-Spigot.jar"; then
-    echo "    ⚠ Trying direct GeyserMC download..."
-    if ! download_file "https://download.geysermc.org/v2/projects/geyser/versions/latest/builds/latest/downloads/spigot" "$INSTALL_DIR/plugins/Geyser-Spigot.jar" || \
-        ! validate_jar "$INSTALL_DIR/plugins/Geyser-Spigot.jar"; then
-        echo "    ✗ FAILED: Geyser-Spigot (optional)"
+if download_from_hangar "GeyserMC/Geyser" "$INSTALL_DIR/plugins/Geyser-Spigot.jar" "PAPER"; then
+    echo "    ✓ Downloaded from Hangar"
+else
+    echo "    ⚠ Hangar failed, trying direct download..."
+    if download_file "https://download.geysermc.org/v2/projects/geyser/versions/latest/builds/latest/downloads/spigot" "$INSTALL_DIR/plugins/Geyser-Spigot.jar" 2>&1 | grep -v "%" && validate_jar "$INSTALL_DIR/plugins/Geyser-Spigot.jar"; then
+        echo "    ✓ Downloaded from GeyserMC"
+    else
+        echo "    ✗ FAILED (optional)"
     fi
 fi
 
 # Floodgate-Spigot (Bedrock authentication)
 echo "  • Floodgate-Spigot (Bedrock authentication)..."
-if ! download_from_hangar "GeyserMC/Floodgate" "$INSTALL_DIR/plugins/floodgate-spigot.jar" "PAPER" || \
-    ! validate_jar "$INSTALL_DIR/plugins/floodgate-spigot.jar"; then
-    echo "    ⚠ Trying direct GeyserMC download..."
-    if ! download_file "https://download.geysermc.org/v2/projects/floodgate/versions/latest/builds/latest/downloads/spigot" "$INSTALL_DIR/plugins/floodgate-spigot.jar" || \
-        ! validate_jar "$INSTALL_DIR/plugins/floodgate-spigot.jar"; then
-        echo "    ✗ FAILED: Floodgate-Spigot (optional)"
+if download_from_hangar "GeyserMC/Floodgate" "$INSTALL_DIR/plugins/floodgate-spigot.jar" "PAPER"; then
+    echo "    ✓ Downloaded from Hangar"
+else
+    echo "    ⚠ Hangar failed, trying direct download..."
+    if download_file "https://download.geysermc.org/v2/projects/floodgate/versions/latest/builds/latest/downloads/spigot" "$INSTALL_DIR/plugins/floodgate-spigot.jar" 2>&1 | grep -v "%" && validate_jar "$INSTALL_DIR/plugins/floodgate-spigot.jar"; then
+        echo "    ✓ Downloaded from GeyserMC"
+    else
+        echo "    ✗ FAILED (optional)"
     fi
 fi
 
 # ViaVersion (Support for older Java Edition versions)
 echo "  • ViaVersion (Java Edition version compatibility)..."
-if ! download_from_hangar "ViaVersion/ViaVersion" "$INSTALL_DIR/plugins/ViaVersion.jar" "PAPER" || \
-    ! validate_jar "$INSTALL_DIR/plugins/ViaVersion.jar"; then
-    echo "    ✗ FAILED: ViaVersion (optional)"
+if download_from_hangar "ViaVersion/ViaVersion" "$INSTALL_DIR/plugins/ViaVersion.jar" "PAPER"; then
+    echo "    ✓ Downloaded from Hangar"
+else
+    echo "    ✗ FAILED (optional)"
 fi
 
 # ViaBackwards (Support for older versions compatibility)
 echo "  • ViaBackwards (Older version support)..."
-if ! download_from_hangar "ViaVersion/ViaBackwards" "$INSTALL_DIR/plugins/ViaBackwards.jar" "PAPER" || \
-    ! validate_jar "$INSTALL_DIR/plugins/ViaBackwards.jar"; then
-    echo "    ✗ FAILED: ViaBackwards (optional)"
+if download_from_hangar "ViaVersion/ViaBackwards" "$INSTALL_DIR/plugins/ViaBackwards.jar" "PAPER"; then
+    echo "    ✓ Downloaded from Hangar"
+else
+    echo "    ✗ FAILED (optional)"
 fi
 
 # ViaRewind (Support for very old versions)
 echo "  • ViaRewind (Very old version support)..."
-if ! download_from_hangar "ViaVersion/ViaRewind" "$INSTALL_DIR/plugins/ViaRewind.jar" "PAPER" || \
-    ! validate_jar "$INSTALL_DIR/plugins/ViaRewind.jar"; then
-    echo "    ✗ FAILED: ViaRewind (optional)"
+if download_from_hangar "ViaVersion/ViaRewind" "$INSTALL_DIR/plugins/ViaRewind.jar" "PAPER"; then
+    echo "    ✓ Downloaded from Hangar"
+else
+    echo "    ✗ FAILED (optional)"
 fi
 
 # List downloaded plugins
