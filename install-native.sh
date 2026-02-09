@@ -227,7 +227,9 @@ cp -r "$SCRIPT_DIR/config/"* "$INSTALL_DIR/config/"
 # Create worlds directory structure and symlink
 echo "[5.5/8] Setting up worlds directory..."
 mkdir -p "$INSTALL_DIR/worlds/mundo-inicial"
-ln -sfn mundo-inicial "$INSTALL_DIR/worlds/active"
+cd "$INSTALL_DIR/worlds"
+ln -sfn mundo-inicial active
+cd "$INSTALL_DIR"
 echo "  ✓ Created worlds/mundo-inicial and symlink to active"
 
 # Configure server.properties to use worlds/active
