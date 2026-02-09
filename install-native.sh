@@ -232,11 +232,11 @@ ln -sfn mundo-inicial active
 cd "$INSTALL_DIR"
 echo "  ✓ Created worlds/mundo-inicial and symlink to active"
 
-# Configure server.properties to use worlds/active
+# Configure server.properties to use worlds/mundo-inicial
 echo "[5.6/8] Configuring server.properties..."
 cat > "$INSTALL_DIR/server.properties" <<EOF
 # Minecraft Server Configuration
-level-name=worlds/active
+level-name=worlds/mundo-inicial
 server-port=25565
 max-players=20
 difficulty=normal
@@ -246,7 +246,7 @@ spawn-protection=16
 view-distance=10
 enable-command-block=true
 EOF
-echo "  ✓ Server configured to use worlds/active"
+echo "  ✓ Server configured to use worlds/mundo-inicial"
 
 # Setup Python environment
 echo "[6/8] Setting up Python environment for web panel..."
