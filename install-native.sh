@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ═══════════════════════════════════════════════════════════════
-# Minecraft MMORPG System - Native Installation Script
+# Minecraft MMORPG System - Native Installation Script  
 # ═══════════════════════════════════════════════════════════════
 
 set -e
@@ -9,8 +9,9 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 INSTALL_DIR="$SCRIPT_DIR/server"
 JAVA_VERSION="21"
-PAPER_VERSION="1.20.6"
-PAPER_BUILD="151"
+# Paper version will be selected interactively
+PAPER_VERSION=""
+PAPER_BUILD=""
 
 echo "═══════════════════════════════════════════════════════════════"
 echo "  Minecraft MMORPG System - Installer"
@@ -27,6 +28,53 @@ confirm() {
         esac
     done
 }
+
+# Helper function to download with curl (follows redirects)
+download_file() {
+    local url="$1"
+    local output="$2"
+    if command -v curl &> /dev/null; then
+        curl -fSL -o "$output" "$url" 2>/dev/null
+    elif command -v wget &> /dev/null; then
+        wget -qO "$output" "$url" 2>/dev/null
+    else
+        echo "ERROR: Neither curl nor wget found"
+        return 1
+    fi
+}
+
+# Select Paper version interactively
+echo ""
+echo "Fetching available Paper versions..."
+PAPER_VERSIONS=$(curl -sL "https://api.papermc.io/v2/projects/paper" 2>/dev/null | python3 -c "import json,sys; data=json.load(sys.stdin); print(' '.join(data['versions'][-15:]))" 2>/dev/null)
+
+if [ -z "$PAPER_VERSIONS" ]; then
+    echo "⚠ Could not fetch versions from API, using default: 1.20.6"
+    PAPER_VERSION="1.20.6"
+    PAPER_BUILD="151"
+else
+    echo ""
+    echo "Available Paper versions (last 15):"
+    i=1
+    for v in $PAPER_VERSIONS; do
+        printf "  %2d. %s\n" "$i" "$v"
+        ((i++))
+    done
+    echo ""
+    read -p "Enter Paper version [default: 1.20.6]: " selected_version
+    PAPER_VERSION="${selected_version:-1.20.6}"
+    
+    echo "Fetching latest build for Paper $PAPER_VERSION..."
+    PAPER_BUILD=$(curl -sL "https://api.papermc.io/v2/projects/paper/versions/$PAPER_VERSION" 2>/dev/null | python3 -c "import json,sys; data=json.load(sys.stdin); print(data['builds'][-1])" 2>/dev/null)
+    
+    if [ -z "$PAPER_BUILD" ]; then
+        echo "ERROR: Could not fetch build for version $PAPER_VERSION"
+        exit 1
+    fi
+    
+    echo "✓ Using Paper $PAPER_VERSION build $PAPER_BUILD"
+fi
+echo ""
 
 # Check Java
 echo "[1/8] Checking Java $JAVA_VERSION..."
@@ -49,11 +97,18 @@ if ! command -v mvn &> /dev/null; then
 fi
 
 # Download Paper
-echo "[3/8] Downloading Paper $PAPER_VERSION..."
+echo "[3/8] Downloading Paper $PAPER_VERSION build $PAPER_BUILD..."
 mkdir -p "$INSTALL_DIR"
 cd "$INSTALL_DIR"
 if [ ! -f "paper-$PAPER_VERSION-$PAPER_BUILD.jar" ]; then
-    wget "https://api.papermc.io/v2/projects/paper/versions/$PAPER_VERSION/builds/$PAPER_BUILD/downloads/paper-$PAPER_VERSION-$PAPER_BUILD.jar"
+    echo "  Downloading from PaperMC API..."
+    download_file "https://api.papermc.io/v2/projects/paper/versions/$PAPER_VERSION/builds/$PAPER_BUILD/downloads/paper-$PAPER_VERSION-$PAPER_BUILD.jar" "paper-$PAPER_VERSION-$PAPER_BUILD.jar" || {
+        echo "ERROR: Failed to download Paper"
+        exit 1
+    }
+    echo "  ✓ Downloaded $(du -h paper-$PAPER_VERSION-$PAPER_BUILD.jar | cut -f1)"
+else
+    echo "  ✓ Already exists"
 fi
 
 # Accept EULA
@@ -80,59 +135,36 @@ validate_jar() {
 
 # Geyser-Spigot (Bedrock Edition support)
 echo "  • Geyser-Spigot (Bedrock Edition support)..."
-if ! wget -q -O "$INSTALL_DIR/plugins/Geyser-Spigot.jar" \
-    "https://download.geysermc.org/v2/projects/geyser/versions/latest/builds/latest/downloads/spigot" 2>/dev/null || \
+if ! download_file "https://download.geysermc.org/v2/projects/geyser/versions/latest/builds/latest/downloads/spigot" "$INSTALL_DIR/plugins/Geyser-Spigot.jar" || \
     ! validate_jar "$INSTALL_DIR/plugins/Geyser-Spigot.jar"; then
-    echo "    ⚠ Could not download from primary source, trying alternative..."
-    if ! wget -q -O "$INSTALL_DIR/plugins/Geyser-Spigot.jar" \
-        "https://ci.opencollab.dev/job/GeyserMC/job/Geyser/job/master/lastSuccessfulBuild/artifact/bootstrap/spigot/build/libs/Geyser-Spigot.jar" 2>/dev/null || \
-        ! validate_jar "$INSTALL_DIR/plugins/Geyser-Spigot.jar"; then
-        echo "    ⚠ Could not download from CI, trying GitHub..."
-        wget -q -O "$INSTALL_DIR/plugins/Geyser-Spigot.jar" \
-            "https://github.com/GeyserMC/Geyser/releases/latest/download/Geyser-Spigot.jar" 2>/dev/null || \
-            echo "    ✗ FAILED: Geyser-Spigot (optional)"
-    fi
+    echo "    ⚠ Trying GitHub Releases..."
+    download_file "https://github.com/GeyserMC/Geyser/releases/latest/download/Geyser-Spigot.jar" "$INSTALL_DIR/plugins/Geyser-Spigot.jar" || \
+        echo "    ✗ FAILED: Geyser-Spigot (optional)"
 fi
 
 # Floodgate-Spigot (Bedrock authentication)
 echo "  • Floodgate-Spigot (Bedrock authentication)..."
-if ! wget -q -O "$INSTALL_DIR/plugins/floodgate-spigot.jar" \
-    "https://download.geysermc.org/v2/projects/floodgate/versions/latest/builds/latest/downloads/spigot" 2>/dev/null || \
+if ! download_file "https://download.geysermc.org/v2/projects/floodgate/versions/latest/builds/latest/downloads/spigot" "$INSTALL_DIR/plugins/floodgate-spigot.jar" || \
     ! validate_jar "$INSTALL_DIR/plugins/floodgate-spigot.jar"; then
-    echo "    ⚠ Could not download from primary source, trying alternative..."
-    if ! wget -q -O "$INSTALL_DIR/plugins/floodgate-spigot.jar" \
-        "https://ci.opencollab.dev/job/GeyserMC/job/Floodgate/job/master/lastSuccessfulBuild/artifact/spigot/build/libs/floodgate-spigot.jar" 2>/dev/null || \
-        ! validate_jar "$INSTALL_DIR/plugins/floodgate-spigot.jar"; then
-        echo "    ⚠ Could not download from CI, trying GitHub..."
-        wget -q -O "$INSTALL_DIR/plugins/floodgate-spigot.jar" \
-            "https://github.com/GeyserMC/Floodgate/releases/latest/download/floodgate-spigot.jar" 2>/dev/null || \
-            echo "    ✗ FAILED: Floodgate-Spigot (optional)"
-    fi
+    echo "    ⚠ Trying GitHub Releases..."
+    download_file "https://github.com/GeyserMC/Floodgate/releases/latest/download/floodgate-spigot.jar" "$INSTALL_DIR/plugins/floodgate-spigot.jar" || \
+        echo "    ✗ FAILED: Floodgate-Spigot (optional)"
 fi
 
 # ViaVersion (Support for older Java Edition versions)
 echo "  • ViaVersion (Java Edition version compatibility)..."
-if ! wget -q -O "$INSTALL_DIR/plugins/ViaVersion.jar" \
-    "https://hangar.papermc.io/api/v1/projects/ViaVersion/versions/LATEST/downloads/ViaVersion.jar" 2>/dev/null || \
-    ! validate_jar "$INSTALL_DIR/plugins/ViaVersion.jar"; then
+download_file "https://github.com/ViaVersion/ViaVersion/releases/latest/download/ViaVersion.jar" "$INSTALL_DIR/plugins/ViaVersion.jar" || \
     echo "    ✗ FAILED: ViaVersion (optional)"
-fi
 
 # ViaBackwards (Support for older versions compatibility)
 echo "  • ViaBackwards (Older version support)..."
-if ! wget -q -O "$INSTALL_DIR/plugins/ViaBackwards.jar" \
-    "https://hangar.papermc.io/api/v1/projects/ViaBackwards/versions/LATEST/downloads/ViaBackwards.jar" 2>/dev/null || \
-    ! validate_jar "$INSTALL_DIR/plugins/ViaBackwards.jar"; then
+download_file "https://github.com/ViaVersion/ViaBackwards/releases/latest/download/ViaBackwards.jar" "$INSTALL_DIR/plugins/ViaBackwards.jar" || \
     echo "    ✗ FAILED: ViaBackwards (optional)"
-fi
 
 # ViaRewind (Support for very old versions)
 echo "  • ViaRewind (Very old version support)..."
-if ! wget -q -O "$INSTALL_DIR/plugins/ViaRewind.jar" \
-    "https://hangar.papermc.io/api/v1/projects/ViaRewind/versions/LATEST/downloads/ViaRewind.jar" 2>/dev/null || \
-    ! validate_jar "$INSTALL_DIR/plugins/ViaRewind.jar"; then
+download_file "https://github.com/ViaVersion/ViaRewind/releases/latest/download/ViaRewind.jar" "$INSTALL_DIR/plugins/ViaRewind.jar" || \
     echo "    ✗ FAILED: ViaRewind (optional)"
-fi
 
 # List downloaded plugins
 echo ""
@@ -150,7 +182,7 @@ mkdir -p "$INSTALL_DIR/config"
 cp -r "$SCRIPT_DIR/config/"* "$INSTALL_DIR/config/"
 
 # Create active world symlink if default world exists
-if [ -d "$INSTALL_DIR/worlds/mundo-inicial" ]; then
+if [  -d "$INSTALL_DIR/worlds/mundo-inicial" ]; then
     ln -sfn "$INSTALL_DIR/worlds/mundo-inicial" "$INSTALL_DIR/worlds/active"
 fi
 
@@ -166,14 +198,14 @@ pip install -r requirements.txt
 
 # Create management scripts in server root
 echo "[7/8] Creating management scripts..."
-cat > "$INSTALL_DIR/start-server.sh" <<'EOF'
+cat > "$INSTALL_DIR/start-server.sh" <<EOF
 #!/bin/bash
 set -e
 if systemctl --version &> /dev/null && systemctl list-unit-files | grep -q "mmorpg-server.service"; then
     sudo systemctl start mmorpg-server.service
 else
-    cd "$(dirname "$0")"
-    exec /usr/bin/java -Xms4G -Xmx4G -jar paper-1.20.6-151.jar nogui
+    cd "\$(dirname "\$0")"
+    exec /usr/bin/java -Xms4G -Xmx4G -jar paper-$PAPER_VERSION-$PAPER_BUILD.jar nogui
 fi
 EOF
 
@@ -187,15 +219,15 @@ else
 fi
 EOF
 
-cat > "$INSTALL_DIR/restart-server.sh" <<'EOF'
+cat > "$INSTALL_DIR/restart-server.sh" <<EOF
 #!/bin/bash
 set -e
 if systemctl --version &> /dev/null && systemctl list-unit-files | grep -q "mmorpg-server.service"; then
     sudo systemctl restart mmorpg-server.service
 else
     pkill -f "paper.*jar" || true
-    cd "$(dirname "$0")"
-    exec /usr/bin/java -Xms4G -Xmx4G -jar paper-1.20.6-151.jar nogui
+    cd "\$(dirname "\$0")"
+    exec /usr/bin/java -Xms4G -Xmx4G -jar paper-$PAPER_VERSION-$PAPER_BUILD.jar nogui
 fi
 EOF
 
@@ -205,7 +237,7 @@ set -e
 if systemctl --version &> /dev/null && systemctl list-unit-files | grep -q "mmorpg-server.service"; then
     journalctl -u mmorpg-server.service -f --no-pager
 else
-    tail -f "$(dirname "$0")/logs/latest.log"
+    tail -f "\$(dirname "\$0")/logs/latest.log"
 fi
 EOF
 
@@ -225,7 +257,7 @@ set -e
 if systemctl --version &> /dev/null && systemctl list-unit-files | grep -q "mmorpg-web.service"; then
     sudo systemctl start mmorpg-web.service
 else
-    cd "$(dirname "$0")/web"
+    cd "\$(dirname "\$0")/web"
     exec ./start-web.sh
 fi
 EOF
@@ -247,7 +279,7 @@ if systemctl --version &> /dev/null && systemctl list-unit-files | grep -q "mmor
     sudo systemctl restart mmorpg-web.service
 else
     pkill -f "flask.*app.py" || true
-    cd "$(dirname "$0")/web"
+    cd "\$(dirname "\$0")/web"
     exec ./start-web.sh
 fi
 EOF
@@ -258,7 +290,7 @@ set -e
 if systemctl --version &> /dev/null && systemctl list-unit-files | grep -q "mmorpg-web.service"; then
     journalctl -u mmorpg-web.service -f --no-pager
 else
-    tail -f "$(dirname "$0")/web/panel.log"
+    tail -f "\$(dirname "\$0")/web/panel.log"
 fi
 EOF
 
@@ -328,9 +360,12 @@ EOF
     sudo systemctl enable mmorpg-web
 fi
 
+echo ""
 echo "═══════════════════════════════════════════════════════════════"
 echo "  Installation Complete!"
+echo "  Paper Version: $PAPER_VERSION build $PAPER_BUILD"
 echo "  Server: localhost:25565"
 echo "  Web Panel: http://localhost:5000"
 echo "  Default credentials: admin/admin"
 echo "═══════════════════════════════════════════════════════════════"
+
