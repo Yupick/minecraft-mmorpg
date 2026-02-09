@@ -430,13 +430,3 @@ echo "  Server: localhost:25565"
 echo "  Web Panel: http://localhost:5000"
 echo "  Default credentials: admin/admin"
 echo "═══════════════════════════════════════════════════════════════"
-
-lper function to download from Hangar
-download_from_hangar() {
-    local project_slug="$1"lper function to download from Hangar
-download_from_hangar() {
-    local project_slug="$1"
-    local output="$2"
-    local platform="${3:-PAPER}"
-    local output="$2"
-    local platform="${3:-PAPER}"
