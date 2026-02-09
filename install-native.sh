@@ -43,6 +43,25 @@ download_file() {
     fi
 }
 
+# Helper function to download from Hangar
+download_from_hangar() {
+    local project_slug="$1"
+    local output="$2"
+    local platform="${3:-PAPER}"
+    
+    # Get latest version info with download URL or external URL
+    local download_info=$(curl -sL "https://hangar.papermc.io/api/v1/projects/${project_slug}/versions?limit=1&offset=0" 2>/dev/null | \
+        python3 -c "import json,sys; data=json.load(sys.stdin); dl=data['result'][0]['downloads']['${platform}'] if data.get('result') and len(data['result']) > 0 else {}; print(dl.get('downloadUrl') or dl.get('externalUrl') or '')" 2>/dev/null)
+    
+    if [ -z "$download_info" ]; then
+        echo "    ✗ Could not fetch download URL for $project_slug"
+        return 1
+    fi
+    
+    # Download
+    download_file "$download_info" "$output"
+}
+
 # Select Paper version interactively
 echo ""
 echo "Fetching available Paper versions..."
@@ -135,36 +154,46 @@ validate_jar() {
 
 # Geyser-Spigot (Bedrock Edition support)
 echo "  • Geyser-Spigot (Bedrock Edition support)..."
-if ! download_file "https://download.geysermc.org/v2/projects/geyser/versions/latest/builds/latest/downloads/spigot" "$INSTALL_DIR/plugins/Geyser-Spigot.jar" || \
+if ! download_from_hangar "GeyserMC/Geyser" "$INSTALL_DIR/plugins/Geyser-Spigot.jar" "PAPER" || \
     ! validate_jar "$INSTALL_DIR/plugins/Geyser-Spigot.jar"; then
-    echo "    ⚠ Trying GitHub Releases..."
-    download_file "https://github.com/GeyserMC/Geyser/releases/latest/download/Geyser-Spigot.jar" "$INSTALL_DIR/plugins/Geyser-Spigot.jar" || \
+    echo "    ⚠ Trying direct GeyserMC download..."
+    if ! download_file "https://download.geysermc.org/v2/projects/geyser/versions/latest/builds/latest/downloads/spigot" "$INSTALL_DIR/plugins/Geyser-Spigot.jar" || \
+        ! validate_jar "$INSTALL_DIR/plugins/Geyser-Spigot.jar"; then
         echo "    ✗ FAILED: Geyser-Spigot (optional)"
+    fi
 fi
 
 # Floodgate-Spigot (Bedrock authentication)
 echo "  • Floodgate-Spigot (Bedrock authentication)..."
-if ! download_file "https://download.geysermc.org/v2/projects/floodgate/versions/latest/builds/latest/downloads/spigot" "$INSTALL_DIR/plugins/floodgate-spigot.jar" || \
+if ! download_from_hangar "GeyserMC/Floodgate" "$INSTALL_DIR/plugins/floodgate-spigot.jar" "PAPER" || \
     ! validate_jar "$INSTALL_DIR/plugins/floodgate-spigot.jar"; then
-    echo "    ⚠ Trying GitHub Releases..."
-    download_file "https://github.com/GeyserMC/Floodgate/releases/latest/download/floodgate-spigot.jar" "$INSTALL_DIR/plugins/floodgate-spigot.jar" || \
+    echo "    ⚠ Trying direct GeyserMC download..."
+    if ! download_file "https://download.geysermc.org/v2/projects/floodgate/versions/latest/builds/latest/downloads/spigot" "$INSTALL_DIR/plugins/floodgate-spigot.jar" || \
+        ! validate_jar "$INSTALL_DIR/plugins/floodgate-spigot.jar"; then
         echo "    ✗ FAILED: Floodgate-Spigot (optional)"
+    fi
 fi
 
 # ViaVersion (Support for older Java Edition versions)
 echo "  • ViaVersion (Java Edition version compatibility)..."
-download_file "https://github.com/ViaVersion/ViaVersion/releases/latest/download/ViaVersion.jar" "$INSTALL_DIR/plugins/ViaVersion.jar" || \
+if ! download_from_hangar "ViaVersion/ViaVersion" "$INSTALL_DIR/plugins/ViaVersion.jar" "PAPER" || \
+    ! validate_jar "$INSTALL_DIR/plugins/ViaVersion.jar"; then
     echo "    ✗ FAILED: ViaVersion (optional)"
+fi
 
 # ViaBackwards (Support for older versions compatibility)
 echo "  • ViaBackwards (Older version support)..."
-download_file "https://github.com/ViaVersion/ViaBackwards/releases/latest/download/ViaBackwards.jar" "$INSTALL_DIR/plugins/ViaBackwards.jar" || \
+if ! download_from_hangar "ViaVersion/ViaBackwards" "$INSTALL_DIR/plugins/ViaBackwards.jar" "PAPER" || \
+    ! validate_jar "$INSTALL_DIR/plugins/ViaBackwards.jar"; then
     echo "    ✗ FAILED: ViaBackwards (optional)"
+fi
 
 # ViaRewind (Support for very old versions)
 echo "  • ViaRewind (Very old version support)..."
-download_file "https://github.com/ViaVersion/ViaRewind/releases/latest/download/ViaRewind.jar" "$INSTALL_DIR/plugins/ViaRewind.jar" || \
+if ! download_from_hangar "ViaVersion/ViaRewind" "$INSTALL_DIR/plugins/ViaRewind.jar" "PAPER" || \
+    ! validate_jar "$INSTALL_DIR/plugins/ViaRewind.jar"; then
     echo "    ✗ FAILED: ViaRewind (optional)"
+fi
 
 # List downloaded plugins
 echo ""
