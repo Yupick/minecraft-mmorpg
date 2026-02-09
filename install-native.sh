@@ -224,10 +224,27 @@ echo "[5/8] Copying configuration files..."
 mkdir -p "$INSTALL_DIR/config"
 cp -r "$SCRIPT_DIR/config/"* "$INSTALL_DIR/config/"
 
-# Create active world symlink if default world exists
-if [  -d "$INSTALL_DIR/worlds/mundo-inicial" ]; then
-    ln -sfn "$INSTALL_DIR/worlds/mundo-inicial" "$INSTALL_DIR/worlds/active"
-fi
+# Create worlds directory structure and symlink
+echo "[5.5/8] Setting up worlds directory..."
+mkdir -p "$INSTALL_DIR/worlds/mundo-inicial"
+ln -sfn mundo-inicial "$INSTALL_DIR/worlds/active"
+echo "  ✓ Created worlds/mundo-inicial and symlink to active"
+
+# Configure server.properties to use worlds/active
+echo "[5.6/8] Configuring server.properties..."
+cat > "$INSTALL_DIR/server.properties" <<EOF
+# Minecraft Server Configuration
+level-name=worlds/active
+server-port=25565
+max-players=20
+difficulty=normal
+gamemode=survival
+pvp=true
+spawn-protection=16
+view-distance=10
+enable-command-block=true
+EOF
+echo "  ✓ Server configured to use worlds/active"
 
 # Setup Python environment
 echo "[6/8] Setting up Python environment for web panel..."
@@ -412,3 +429,12 @@ echo "  Web Panel: http://localhost:5000"
 echo "  Default credentials: admin/admin"
 echo "═══════════════════════════════════════════════════════════════"
 
+lper function to download from Hangar
+download_from_hangar() {
+    local project_slug="$1"lper function to download from Hangar
+download_from_hangar() {
+    local project_slug="$1"
+    local output="$2"
+    local platform="${3:-PAPER}"
+    local output="$2"
+    local platform="${3:-PAPER}"
